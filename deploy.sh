@@ -188,6 +188,7 @@ rsync -avz \
     --exclude ".vscode/" \
     --exclude ".idea/" \
     --exclude ".DS_Store" \
+    --exclude "settings.py" \
     ./ "$VPS:$PROJECT_DIR/"
 
 # ============================================================
