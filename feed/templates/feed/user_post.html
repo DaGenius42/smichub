@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} · CampusConnect{% endblock %}
+
+{% block content %}
+<div class="detail-layout">
+    <article class="detail-card">
+        <div class="post-card-topline">
+            <span class="category-pill category-{{ post.category }}">
+                {{ post.get_category_display }}
+            </span>
+            <span class="muted">
+                {{ post.created_at|date:"M j, Y · H:i" }}
+            </span>
+        </div>
+
+        <h1>{{ post.title }}</h1>
+
+        <div class="author-link">
+            <span class="avatar avatar-large">
+                {{ post.author.username|first|upper }}
+            </span>
+            <span>
+                <strong>@{{ post.author.username }}</strong><br>
+                <span class="muted">Student post</span>
+            </span>
+        </div>
+
+        <div class="post-body">
+            {{ post.body|linebreaks }}
+        </div>
+        <br>
+        <br>
+
+        <form method="post" action="{% url 'feed:like_post' post.id %}">
+            {% csrf_token %}
+            <button class="button button-secondary" type="submit">
+                {% if user in post.likes.all %}
+                    🩶Unlike
+                {% else %}
+                    ❤️Like
+                {% endif %}
+            </button>
+            <h3>{{ post.like_count }} likes</h3>
+        </form>
+
+        
+    </article>
+    <br>
+    <section class="comments-card">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Discussion</p>
+                <h2>
+                    {{ post.comments.count }}
+                    repl{{ post.comments.count|pluralize:"y,ies" }}
+                </h2>
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+            <form
+                class="stacked-form comment-form"
+                action="{% url 'feed:create_comment' post.id %}"
+                method="post"
+            >
+                {% csrf_token %}
+                {{ comments_form.as_p }}
+                <button class="button" type="submit">
+                    Post reply
+                </button>
+            </form>
+        {% else %}
+            <p class="login-callout">
+                <a href="{% url 'accounts:login' %}">Log in</a>
+                to join the discussion.
+            </p>
+        {% endif %}
+
+        <div class="comment-list">
+            {% for comment in post.comments.all %}
+                <article class="comment">
+                    <div class="comment-head">
+                        <span class="author-link">
+                            <span class="avatar">
+                                {{ comment.author.username|first|upper }}
+                            </span>
+                            <strong>
+                                @{{ comment.author.username }}
+                            </strong>
+                        </span>
+                        <span class="muted">
+                            {{ comment.created_at|date:"M j · H:i" }}
+                        </span>
+                    </div>
+                    <div>{{ comment.body|linebreaks }}</div>
+                </article>
+            {% empty %}
+                <p class="muted">
+                    No replies yet. Start the discussion.
+                </p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <br>
+    {% if request.user == post.author %}
+        <form method="post" action="{% url 'feed:delete_post' post.id %}">
+            {% csrf_token %}
+            <button class="danger-link" type="submit">
+                Delete Post
+            </button>
+        </form>
+    {% endif %}
+    
+    <a class="text-action" href="{% url 'feed:home' %}">
+        ← Back to feed
+    </a>
+</div>
+{% endblock %}

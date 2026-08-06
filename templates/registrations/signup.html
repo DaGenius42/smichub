@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Join · CampusConnect{% endblock %}
+
+{% block content %}
+<section class="form-card auth-card">
+    <p class="eyebrow">Create an account</p>
+    <h1>Join your academic community</h1>
+    <p class="muted">Use a username classmates can recognize.</p>
+
+    <form class="stacked-form" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="button" type="submit">Create account</button>
+    </form>
+
+    <p class="form-footnote">
+        Already registered?
+        <a href="{% url 'accounts:login' %}">Log in</a>.
+    </p>
+</section>
+{% endblock %}

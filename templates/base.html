@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CampusConnect{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'feed/css/style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-shell">
+            <a class="brand" href="{% url 'feed:home' %}">
+                <span class="brand-mark">S</span>
+                <span>SMIC HUB</span>
+            </a>
+
+            <nav class="main-nav">
+                <a href="{% url 'feed:home' %}">Explore</a>
+
+                {% if user.is_authenticated %}
+                    <span class="muted">@{{ user.username }}</span>
+                    <form
+                        action="{% url 'accounts:logout' %}"
+                        method="post"
+                        class="inline-form"
+                    >
+                        {% csrf_token %}
+                        <button class="nav-button" type="submit">
+                            Log out
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}">Log in</a>
+                    <a class="button button-small"
+                       href="{% url 'accounts:signup' %}">
+                        Join
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

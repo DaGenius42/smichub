@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Explore · SMICHUB{% endblock %}
+
+{% block content %}
+<section class="hero-panel">
+    <div>
+        <p class="eyebrow">Griffin Community</p>
+        <h1>Make a dream. It's free</h1>
+        <p class="hero-copy">
+            - Ahmed Abbache
+        </p>
+    </div>
+    <a class="button" href="{% url 'feed:create_post' %}">Share something</a>
+</section>
+
+<section class="content-grid">
+    <div class="feed-column">
+        <form method="get" class="filter-bar">
+            <input
+                value="{{query}}"
+                placeholder="Search titles, posts, or students"
+                type = "search"
+                name = "q"
+            >
+            <select name="category">
+                <option value="">All categories</option>
+                {% for value, label in categories %}
+                    <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button class="button button-secondary" type = "submit">Search</button>
+            {% if query or selected_category %}
+                <a class="clear-link" href="{% url 'feed:home' %}">
+                    Clear filters
+                </a>
+            {% endif %}
+        </form>
+
+        <br>
+        <div class="house-container-main">
+            <div class="house-header-bar">
+                <div>
+                    <p class="eyebrow">Inter-House Competition</p>
+                    <h2 class="house-main-title">Official House Point Standings</h2>
+                </div>
+                <span class="muted-text">Updated Daily • SMIC Student Affairs</span>
+            </div>
+
+            <div class="house-grid-four">
+                {% for house in houses %}
+                <div class="house-card-wrapper house-{{ house.name|lower }}">
+                    <div class="house-image-frame">
+                        {% if house.crest_image %}
+                            <img src="{{ house.crest_image.url }}" alt="{{ house.name }} House Crest" class="house-crest-img">
+                        {% else %}
+                            <span class="no-image-text">Crest</span>
+                        {% endif %}
+                    </div>
+                    <span class="house-name-label">{{ house.name }}</span>
+                    <span class="house-point-value">{{ house.points }} points</span>
+                </div>
+                {% empty %}
+                <div class="empty-house-notice">
+                    <p>No house data available currently</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Latest activity</p>
+                <h2>News</h2>
+            </div>
+            <span class="muted">{{ news|length }} results</span>
+        </div>
+        <div class="post-list">
+            {% for news_item in news %}
+                <a href="{% url 'feed:news_post' news_item.id %}">
+                    <article class="post-card">
+                        <div class="post-card-topline">
+                            <span class="category-pill category-news">
+                                {{ news_item.category | upper }}
+                            </span>
+                            <span class="muted">{{ news_item.created_at | date:"M / j / g"}}</span>
+                        </div>
+
+                        <h2 class="post-title">
+                            {{ news_item.title }}
+                        </h2>
+
+                        <p class="post-excerpt">
+                            {{ news_item.body | truncatechars:600 }}
+                        </p>
+
+                        <div class="post-footer">
+                            <span class="author-link">
+                                <span class="avatar">S</span>
+                                @SMIC Official
+                            </span>
+                            <div class="post-stats">
+                                <span>{{ news_item.like_count }} likes</span>
+                            </div>
+                        </div>
+                    </article>
+                </a>
+            {% empty %}
+                <div class="empty-state"><h3>No news available.</h3><p>Check back later for updates!</p></div>
+            {% endfor %}
+        </div>
+
+        <!-- Community Feed -->
+        <div class="section-heading">
+            <div>
+                <h2>Community feed</h2>
+            </div>
+            <span class="muted">{{ posts|length }} results</span>
+        </div>
+
+        <div class="post-list">
+            {% for post in posts %}
+                {% if post.verified %}
+                    <a href="{% url 'feed:user_post' post.id %}">
+                        <article class="post-card">
+                            <div class="post-card-topline">
+                                <span class="category-pill category-{{ post.category}}">
+                                    {{ post.category | upper }}
+                                </span>
+                                <span class="muted">{{post.created_at | date:"M / j / g"}}</span>
+                            </div>
+
+                            <h2 class="post-title">
+                                {{ post.title }}
+                            </h2>
+
+                            <p class="post-excerpt">
+                                {{ post.body | truncatechars:600 }}
+                            </p>
+
+                            <div class="post-footer">
+                                <span class="author-link">
+                                    <span class="avatar">{{ post.author.username|first|upper }}</span>
+                                    @{{ post.author.username }}
+                                </span>
+                                <div class="post-stats">
+                                    <span>{{ post.like_count }} likes</span>
+                                    <span>{{ post.comment_count }} replies</span>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+                {% endif %}
+            {% empty %}
+                <div class="empty-state"><h3>No posts available.</h3><p>Be the first to post!</p></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <aside class="sidebar-card">
+        <p class="eyebrow">Click to visit: </p>
+        <h3><b>Da Portals🚪</b></h3>
+        <ul class="clean-list">
+            <li><u><a href="http://et.bjsmicschool.com">SMIC Official Website🆕</a></u></li>
+            <li><u><a href="https://et-bjsmicschool.managebac.cn/login">Managebac🕙</a></u></li>
+            <li><u><a href="https://www.collegeboard.org/?newAccount=true">Collegeboard📑</a></u></li>
+            <li><u><a href="https://account.microsoft.com/account">Email📧</a></u></li>
+            <li><u><a href="https://royaleapi.com">Royale API🫅</a></u></li>
+        </ul>
+    </aside>
+</section>
+{% endblock %}

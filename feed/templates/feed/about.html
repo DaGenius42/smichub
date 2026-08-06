@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - SMIC Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            color: #111827;
+            line-height: 1.7;
+        }
+
+        /* Site Header Navigation */
+        .site-header {
+            background: #ffffff;
+            padding: 16px 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .site-brand {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            margin-left: 24px;
+            color: #374151;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        /* Main Page Wrapper */
+        .about-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 24px;
+        }
+
+        /* Hero Banner Section */
+        .about-hero {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .about-hero h1 {
+            font-size: 38px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+
+        .about-hero p {
+            font-size: 18px;
+            color: #6b7280;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Standard Card Component (matches dashboard styling) */
+        .about-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 36px;
+            margin-bottom: 32px;
+        }
+
+        .about-card h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+            border-left: 4px solid #2563eb;
+            padding-left: 12px;
+        }
+
+        .content-area {
+            min-height: 120px;
+            color: #4b5563;
+            font-size: 16px;
+        }
+
+        /* Team Member Grid Layout */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .team-card {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .team-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            margin: 0 auto 12px;
+        }
+
+        .team-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .team-card p {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Footer */
+        .site-footer {
+            text-align: center;
+            padding: 32px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* Mobile Responsive Rules */
+        @media (max-width: 768px) {
+            .about-hero h1 {
+                font-size: 28px;
+            }
+            .about-card {
+                padding: 24px;
+            }
+            .nav-links a {
+                margin-left: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="site-header">
+        <a href="#" class="site-brand">SMIC Hub</a>
+        <nav class="nav-links">
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#">Login</a>
+        </nav>
+    </header>
+
+    <!-- Main About Page Content -->
+    <main class="about-container">
+        <section class="about-hero">
+            <h1>About Our Platform</h1>
+            <p>Learn more about our mission, vision, and the team behind the platform.</p>
+        </section>
+
+        <!-- Mission Section (Empty for custom text) -->
+        <section class="about-card">
+            <h2>Our Mission</h2>
+            <div class="content-area">
+                <!-- Insert your mission statement text here -->
+            </div>
+        </section>
+
+        <!-- Vision Section (Empty for custom text) -->
+        <section class="about-card">
+            <h2>Our Vision</h2>
+            <div class="content-area">
+                <!-- Insert your vision statement text here -->
+            </div>
+        </section>
+
+        <!-- Who We Are Platform Intro -->
+        <section class="about-card">
+            <h2>Who We Are</h2>
+            <div class="content-area">
+                <!-- Insert platform introduction text here -->
+            </div>
+        </section>
+
+        <!-- Team Members Section -->
+        <section class="about-card">
+            <h2>Our Team</h2>
+            <div class="content-area">
+                <!-- Insert team introduction paragraph here -->
+            </div>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-avatar"></div>
+                    <h4>Member Name</h4>
+                    <p>Member Role</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar"></div>
+                    <h4>Member Name</h4>
+                    <p>Member Role</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Values Section -->
+        <section class="about-card">
+            <h2>Our Core Values</h2>
+            <div class="content-area">
+                <!-- Insert core values text here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Page Footer -->
+    <footer class="site-footer">
+        <p>© 2026 SMIC Hub. All rights reserved.</p>
+    </footer>
+</body>
+</html>

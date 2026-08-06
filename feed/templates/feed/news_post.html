@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ news.title }} · CampusConnect{% endblock %}
+
+{% block content %}
+<div class="detail-layout">
+    <article class="detail-card">
+        <div class="post-card-topline">
+            <span class="category-pill category-{{ news.category }}">
+                {{ news.get_category_display }}
+            </span>
+            <span class="muted">
+                {{ news.created_at|date:"M j, Y · H:i" }}
+            </span>
+        </div>
+
+        <h1>{{ news.title }}</h1>
+
+        <div class="author-link">
+            <span class="avatar avatar-large">
+                {{ news.author.username|first|upper }}
+            </span>
+            <span>
+                <strong>@SMIC</strong><br>
+                <span class="muted">Official</span>
+            </span>
+        </div>
+
+        <div class="post-body">
+            {{ news.body|linebreaks }}
+        </div>
+        <br>
+        <br>
+
+        <form method="post" action="{% url 'feed:like_news' news.id %}">
+            {% csrf_token %}
+            <button class="button button-secondary" type="submit">
+                {% if user in news.likes.all %}
+                    🩶Unlike
+                {% else %}
+                    ❤️Like
+                {% endif %}
+            </button>
+            <h3>{{ news.like_count }} likes</h3>
+        </form>
+
+        <br>
+        <a class="text-action" href="{% url 'feed:home' %}">
+            ← Back to feed
+        </a>
+    </article>
+</div>
+{% endblock %}

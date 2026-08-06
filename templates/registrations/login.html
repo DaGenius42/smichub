@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Log in · CampusConnect{% endblock %}
+
+{% block content %}
+<section class="form-card auth-card">
+    <p class="eyebrow">Welcome back</p>
+    <h1>Log in</h1>
+    <p class="muted">Continue reading, asking, and sharing.</p>
+
+    <form class="stacked-form" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        {% if next %}
+            <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
+
+        <button class="button" type="submit">Log in</button>
+    </form>
+
+    <p class="form-footnote">
+        No account yet?
+        <a href="{% url 'accounts:signup' %}">Create one</a>.
+    </p>
+</section>
+{% endblock %}
