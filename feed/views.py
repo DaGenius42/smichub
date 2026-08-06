@@ -11,7 +11,7 @@ from django.db.models import Q
 def home(request):
     query = request.GET.get('q' , '').strip()
     selected_category = request.GET.get('category', '').strip()
-    posts = Post.objects.select_related("author").prefetch_related("comments__author")
+    posts = Post.objects.select_related("author").prefetch_related("comments__author").filter(verified=True).order_by('-created_at')
     news = News.objects.all()
     house = House.objects.all()
     if query:
