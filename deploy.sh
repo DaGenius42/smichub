@@ -30,24 +30,7 @@ fi
 
 echo
 echo "1. Finding local Python..."
-"""
-if [[ -x ".venv/Scripts/python.exe" ]]; then
-    LOCAL_PYTHON=".venv/Scripts/python.exe"
-elif [[ -x "venv/Scripts/python.exe" ]]; then
-    LOCAL_PYTHON="venv/Scripts/python.exe"
-elif [[ -x ".venv/bin/python" ]]; then
-    LOCAL_PYTHON=".venv/bin/python"
-elif [[ -x "venv/bin/python" ]]; then
-    LOCAL_PYTHON="venv/bin/python"
-elif command -v python >/dev/null 2>&1; then
-    LOCAL_PYTHON="python"
-elif command -v python3 >/dev/null 2>&1; then
-    LOCAL_PYTHON="python3"
-else
-    echo "ERROR: Could not find Python."
-    exit 1
-"""
-fi
+
 LOCAL_PYTHON="python3"
 echo "Using: $LOCAL_PYTHON"
 
