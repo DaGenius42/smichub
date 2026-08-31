@@ -1,134 +1,40 @@
-{% extends "base.html" %}
-{% block title %}Explore · SMICHUB{% endblock %}
+{% extends "base-after-login.html" %}
+
+{% block title %}SMICHUB{% endblock %}
 
 {% block content %}
-<section class="hero-panel">
-    <div>
-        <p class="eyebrow">Griffin Community</p>
-        <h1>Make a dream. It's free</h1>
-        <p class="hero-copy">
-            - Ahmed Abbache
-        </p>
-    </div>
-    <a class="button" href="{% url 'feed:create_post' %}">Share something</a>
-</section>
-
 <section class="content-grid">
+    <!-- Center column - only posts -->
     <div class="feed-column">
-        <form method="get" class="filter-bar">
-            <input
-                value="{{query}}"
-                placeholder="Search titles, posts, or students"
-                type = "search"
-                name = "q"
-            >
-            <select name="category">
-                <option value="">All categories</option>
-                {% for value, label in categories %}
-                    <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>
-                        {{ label }}
-                    </option>
-                {% endfor %}
-            </select>
-            <button class="button button-secondary" type = "submit">Search</button>
-            {% if query or selected_category %}
-                <a class="clear-link" href="{% url 'feed:home' %}">
-                    Clear filters
-                </a>
-            {% endif %}
-        </form>
+        <!-- Create post CTA -->
+        <a href="{% url 'feed:create_post' %}" class="create-post-cta">
+            <span class="cta-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+            </span>
+            <span class="cta-copy">
+                <strong>Create a post now</strong>
+                <span class="muted">Share something with your school community</span>
+            </span>
+            <span class="cta-arrow">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </span>
+        </a>
 
-        <br>
-        <div class="house-container-main">
-            <div class="house-header-bar">
-                <div>
-                    <p class="eyebrow">Inter-House Competition</p>
-                    <h2 class="house-main-title">Official House Point Standings</h2>
-                </div>
-                <span class="muted-text">Updated Daily • SMIC Student Affairs</span>
-            </div>
-
-            <div class="house-grid-four">
-                {% for house in houses %}
-                <div class="house-card-wrapper house-{{ house.name|lower }}">
-                    <div class="house-image-frame">
-                        {% if house.crest_image %}
-                            <img src="{{ house.crest_image.url }}" alt="{{ house.name }} House Crest" class="house-crest-img">
-                        {% else %}
-                            <span class="no-image-text">Crest</span>
-                        {% endif %}
-                    </div>
-                    <span class="house-name-label">{{ house.name }}</span>
-                    <span class="house-point-value">{{ house.points }} points</span>
-                </div>
-                {% empty %}
-                <div class="empty-house-notice">
-                    <p>No house data available currently</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="section-heading">
-            <div>
-                <p class="eyebrow">Latest activity</p>
-                <h2>News</h2>
-            </div>
-            <span class="muted">{{ news|length }} results</span>
-        </div>
-        <div class="post-list">
-            {% for news_item in news %}
-                <a href="{% url 'feed:news_post' news_item.id %}">
-                    <article class="post-card">
-                        <div class="post-card-topline">
-                            <span class="category-pill category-news">
-                                {{ news_item.category | upper }}
-                            </span>
-                            <span class="muted">{{ news_item.created_at | date:"M / j / g"}}</span>
-                        </div>
-
-                        <h2 class="post-title">
-                            {{ news_item.title }}
-                        </h2>
-
-                        <p class="post-excerpt">
-                            {{ news_item.body | truncatechars:600 }}
-                        </p>
-
-                        <div class="post-footer">
-                            <span class="author-link">
-                                <span class="avatar">S</span>
-                                @SMIC Official
-                            </span>
-                            <div class="post-stats">
-                                <span>{{ news_item.like_count }} likes</span>
-                            </div>
-                        </div>
-                    </article>
-                </a>
-            {% empty %}
-                <div class="empty-state"><h3>No news available.</h3><p>Check back later for updates!</p></div>
-            {% endfor %}
-        </div>
-
-        <!-- Community Feed -->
-        <div class="section-heading">
-            <div>
-                <h2>Community feed</h2>
-            </div>
-            <span class="muted">{{ posts|length }} results</span>
-        </div>
-
+        <!-- Post list -->
         <div class="post-list">
             {% for post in posts %}
                 {% if post.verified %}
                     <a href="{% url 'feed:user_post' post.id %}">
-                        <article class="post-card">
+                        <article class="post-card"
+                            {% if post.author.is_teacher %}
+                                style="background:#9df2ff;"
+                            {% endif %}
+                        >
                             <div class="post-card-topline">
-                                <span class="category-pill category-{{ post.category}}">
+                                <span class="category-pill category-{{ post.category }}">
                                     {{ post.category | upper }}
                                 </span>
-                                <span class="muted">{{post.created_at | date:"M / j / g"}}</span>
+                                <span class="muted">{{ post.created_at|date:"M j, Y · H:i" }}</span>
                             </div>
 
                             <h2 class="post-title">
@@ -139,10 +45,27 @@
                                 {{ post.body | truncatechars:600 }}
                             </p>
 
+                            {% if post.file_attached and post.is_image %}
+                                <div class="post-attachment">
+                                    <img src="{{ post.file_attached.url }}" alt="{{ post.title }}">
+                                </div>
+                            {% endif %}
+
                             <div class="post-footer">
                                 <span class="author-link">
-                                    <span class="avatar">{{ post.author.username|first|upper }}</span>
+                                    <span class="avatar">
+                                        {% if post.author.profile_picture %}
+                                            <img src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+                                        {% else %}
+                                            {{ post.author.username|first|upper }}
+                                        {% endif %}
+                                    </span>
                                     @{{ post.author.username }}
+                                    {% if post.author.is_teacher %}
+                                        <span class="teacher-badge">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+                                        </span>
+                                    {% endif %}
                                 </span>
                                 <div class="post-stats">
                                     <span>{{ post.like_count }} likes</span>
@@ -153,21 +76,85 @@
                     </a>
                 {% endif %}
             {% empty %}
-                <div class="empty-state"><h3>No posts available.</h3><p>Be the first to post!</p></div>
+                <div class="empty-state">
+                    <h3>No posts available.</h3>
+                    <p>Be the first to post!</p>
+                    <br>
+                    <a href="{% url 'feed:create_post' %}" class="button">Create a post</a>
+                </div>
             {% endfor %}
         </div>
+
+        <!-- Pagination -->
+        {% if posts.has_other_pages %}
+            <div class="pagination">
+                {% if posts.has_previous %}
+                    <a href="?page={{ posts.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                        <svg class="icon-left" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                        Previous
+                    </a>
+                {% endif %}
+
+                <span class="current-page">
+                    Page {{ posts.number }} of {{ posts.paginator.num_pages }}
+                </span>
+
+                {% if posts.has_next %}
+                    <a href="?page={{ posts.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                        Next
+                        <svg class="icon-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 
-    <aside class="sidebar-card">
-        <p class="eyebrow">Click to visit: </p>
-        <h3><b>Da Portals🚪</b></h3>
-        <ul class="clean-list">
-            <li><u><a href="http://et.bjsmicschool.com">SMIC Official Website🆕</a></u></li>
-            <li><u><a href="https://et-bjsmicschool.managebac.cn/login">Managebac🕙</a></u></li>
-            <li><u><a href="https://www.collegeboard.org/?newAccount=true">Collegeboard📑</a></u></li>
-            <li><u><a href="https://account.microsoft.com/account">Email📧</a></u></li>
-            <li><u><a href="https://royaleapi.com">Royale API🫅</a></u></li>
-        </ul>
+    <!-- Right sidebar: search, house standings, news, portals -->
+    <aside class="right-sidebar">
+
+        <!-- Search -->
+        <div class="sidebar-card search-card">
+            <p class="eyebrow">Find posts</p>
+            <h3>Search</h3>
+            <form method="get" action="{% url 'feed:home' %}" class="search-form">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search posts…">
+                {% if selected_category %}
+                    <input type="hidden" name="category" value="{{ selected_category }}">
+                {% endif %}
+                <button class="button button-full" type="submit">Search</button>
+            </form>
+            {% if query or selected_category %}
+                <a class="clear-link" href="{% url 'feed:home' %}">Clear filters</a>
+            {% endif %}
+        </div>
+        <!-- Stuco News -->
+        <div class="sidebar-card search-card">
+            <p class="eyebrow">School Updates</p>
+            <h3><b>StuCo News</b></h3>
+            <ul class="news-list">
+                {% for news_item in news|slice:":5" %}
+                    <li>
+                        <a href="{% url 'feed:news_post' news_item.id %}" class="news-link">
+                            {{ news_item.title }}
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="muted">No news available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- Portals -->
+        <div class="sidebar-card search-card">
+            <p class="eyebrow">Click to visit:</p>
+            <h3><b><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4.562v16.157a1 1 0 0 1-1.242.97L5 20V5.562a2 2 0 0 1 1.515-1.94l4-1A2 2 0 0 1 13 4.561Z"/></svg> Website Portals</b></h3>
+            <ul class="clean-list">
+                <li><u><a href="http://et.bjsmicschool.com"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>SMIC Official Website</a></u></li>
+                <li><u><a href="https://et-bjsmicschool.managebac.cn/login"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Managebac</a></u></li>
+                <li><u><a href="https://www.collegeboard.org/?newAccount=true"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>Collegeboard</a></u></li>
+                <li><u><a href="https://account.microsoft.com/account"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>Email</a></u></li>
+                <li><u><a href="https://royaleapi.com"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.735H5.81a1 1 0 0 1-.957-.735L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg>Royale API</a></u></li>
+            </ul>
+        </div>
     </aside>
 </section>
 {% endblock %}

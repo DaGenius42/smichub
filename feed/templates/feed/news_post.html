@@ -1,9 +1,17 @@
-{% extends "base.html" %}
+{% extends "base-after-login.html" %}
 
-{% block title %}{{ news.title }} · CampusConnect{% endblock %}
+{% block title %}{{ news.title }} · SMICHUB{% endblock %}
 
 {% block content %}
+<a class="text-action" href="{% url 'feed:home' %}">
+            <svg class="icon-left" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+            Back
+        </a>
+<br>
+<br>
 <div class="detail-layout">
+    
+        
     <article class="detail-card">
         <div class="post-card-topline">
             <span class="category-pill category-{{ news.category }}">
@@ -18,7 +26,7 @@
 
         <div class="author-link">
             <span class="avatar avatar-large">
-                {{ news.author.username|first|upper }}
+                S
             </span>
             <span>
                 <strong>@SMIC</strong><br>
@@ -31,23 +39,54 @@
         </div>
         <br>
         <br>
+        <!-- Image preview for photos -->
+        {% if news.file_attached and news.is_image %}
+            <div class="post-attachment">
+                <img src="{{ news.file_attached.url }}" alt="{{ news.title }}">
+            </div>
+        {% endif %}
+
+        <!-- File Attachment Display -->
+        {% if news.file_attached and not news.is_image %}
+            <div class="file-attachment">
+                <div class="file-attachment-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <div class="file-info">
+                        <a href="{{ news.file_attached.url }}" target="_blank" class="file-name">
+                            {{ news.file_attached.name|cut:"uploads/" }}
+                        </a>
+                        <span class="file-size muted">
+                            {{ news.file_attached.size|filesizeformat }}
+                        </span>
+                    </div>
+                    <a href="{{ news.file_attached.url }}" download class="download-button" title="Download file">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        <br>
 
         <form method="post" action="{% url 'feed:like_news' news.id %}">
             {% csrf_token %}
             <button class="button button-secondary" type="submit">
                 {% if user in news.likes.all %}
-                    🩶Unlike
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: red;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                    {{ news.like_count }}
                 {% else %}
-                    ❤️Like
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: #9ca3af;"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                    {{ news.like_count }}
                 {% endif %}
             </button>
-            <h3>{{ news.like_count }} likes</h3>
         </form>
 
-        <br>
-        <a class="text-action" href="{% url 'feed:home' %}">
-            ← Back to feed
-        </a>
     </article>
 </div>
 {% endblock %}

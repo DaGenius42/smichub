@@ -2,10 +2,6 @@
 
 set -Eeuo pipefail
 
-# ============================================================
-# YOUR VERIFIED VPS SETTINGS
-# ============================================================
-
 VPS="root@smichub.org"
 
 PROJECT_DIR="/var/www/SMICHUB"
@@ -18,31 +14,22 @@ DB_FILE="/var/www/SMICHUB/db.sqlite3"
 BACKUP_DIR="/root/smichubbackup"
 DOMAIN="smichub.org"
 
-# ============================================================
-# MOVE INTO THE LOCAL PROJECT DIRECTORY
-# ============================================================
-
-# This ensures the script works even when launched from another folder.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 echo
 echo "=========================================="
-echo "Deploying SMICHUB"
+echo "        Deploying SMICHUB"
 echo "=========================================="
 
-# ============================================================
-# 1. CHECK THE LOCAL PROJECT
-# ============================================================
-
 if [[ ! -f "manage.py" ]]; then
-    echo "ERROR: manage.py was not found."
-    echo "Place deploy.sh in the same folder as manage.py."
+    echo "ERROR: manage.py not found."
+    echo "deploy.sh must be in the same folder as manage.py."
     exit 1
 fi
 
 echo
-echo "1. Finding the local Python environment..."
+echo "1. Finding local Python..."
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
     LOCAL_PYTHON=".venv/Scripts/python.exe"
@@ -57,35 +44,24 @@ elif command -v python >/dev/null 2>&1; then
 elif command -v python3 >/dev/null 2>&1; then
     LOCAL_PYTHON="python3"
 else
-    echo "ERROR: No local Python interpreter was found."
+    echo "ERROR: Could not find Python."
     exit 1
 fi
 
 echo "Using: $LOCAL_PYTHON"
 
 echo
-echo "2. Running local Django checks..."
-
+echo "2. Running local Django check..."
 "$LOCAL_PYTHON" manage.py check
 
 echo
 echo "3. Running local tests..."
-
 "$LOCAL_PYTHON" manage.py test
 
-# ============================================================
-# 2. VERIFY THE VPS BEFORE CHANGING ANYTHING
-# ============================================================
-
 echo
-echo "4. Checking the VPS configuration..."
+echo "4. Checking VPS..."
 
-ssh "$VPS" bash -s -- \
-    "$PROJECT_DIR" \
-    "$SERVICE_NAME" \
-    "$ENV_FILE" \
-    "$VENV_DIR" \
-    "$DB_FILE" <<'REMOTE_CHECK'
+ssh "$VPS" bash -s --     "$PROJECT_DIR"     "$SERVICE_NAME"     "$ENV_FILE"     "$VENV_DIR"     "$DB_FILE" <<'REMOTE_CHECK'
 
 set -Eeuo pipefail
 
@@ -95,49 +71,30 @@ ENV_FILE="$3"
 VENV_DIR="$4"
 DB_FILE="$5"
 
-check_path() {
-    local path="$1"
-    local description="$2"
+[[ -d "$PROJECT_DIR" ]] || { echo "ERROR: Project directory missing: $PROJECT_DIR"; exit 1; }
+[[ -f "$PROJECT_DIR/manage.py" ]] || { echo "ERROR: manage.py missing on VPS."; exit 1; }
+[[ -f "$ENV_FILE" ]] || { echo "ERROR: Environment file missing: $ENV_FILE"; exit 1; }
+[[ -x "$VENV_DIR/bin/python" ]] || { echo "ERROR: venv Python missing: $VENV_DIR/bin/python"; exit 1; }
+[[ -f "$DB_FILE" ]] || { echo "ERROR: Database missing: $DB_FILE"; exit 1; }
 
-    if [[ ! -e "$path" ]]; then
-        echo "ERROR: $description was not found:"
-        echo "$path"
-        exit 1
-    fi
+systemctl cat "$SERVICE_NAME" >/dev/null 2>&1 || {
+    echo "ERROR: systemd service not found: $SERVICE_NAME"
+    exit 1
 }
 
-check_path "$PROJECT_DIR" "Project directory"
-check_path "$PROJECT_DIR/manage.py" "manage.py"
-check_path "$ENV_FILE" "Environment file"
-check_path "$VENV_DIR/bin/python" "Virtual-environment Python"
-check_path "$DB_FILE" "SQLite database"
-
-if ! systemctl cat "$SERVICE_NAME" >/dev/null 2>&1; then
-    echo "ERROR: systemd service was not found:"
-    echo "$SERVICE_NAME"
+command -v sqlite3 >/dev/null 2>&1 || {
+    echo "ERROR: sqlite3 is not installed on VPS."
+    echo "Run once: apt update && apt install -y sqlite3"
     exit 1
-fi
+}
 
-if ! command -v sqlite3 >/dev/null 2>&1; then
-    echo "ERROR: sqlite3 is not installed on the VPS."
-    echo "Install it once with:"
-    echo "apt update && apt install -y sqlite3"
-    exit 1
-fi
-
-echo "VPS configuration looks correct."
+echo "VPS check OK."
 REMOTE_CHECK
 
-# ============================================================
-# 3. BACK UP THE PRODUCTION DATABASE
-# ============================================================
-
 echo
-echo "5. Backing up the production database..."
+echo "5. Backing up production database..."
 
-ssh "$VPS" bash -s -- \
-    "$DB_FILE" \
-    "$BACKUP_DIR" <<'REMOTE_BACKUP'
+ssh "$VPS" bash -s --     "$DB_FILE"     "$BACKUP_DIR" <<'REMOTE_BACKUP'
 
 set -Eeuo pipefail
 
@@ -154,55 +111,24 @@ sqlite3 "$DB_FILE" ".backup '$BACKUP_FILE'"
 RESULT="$(sqlite3 "$BACKUP_FILE" "PRAGMA integrity_check;")"
 
 if [[ "$RESULT" != "ok" ]]; then
-    echo "ERROR: The database backup failed its integrity check."
+    echo "ERROR: Database backup failed integrity check."
     rm -f "$BACKUP_FILE"
     exit 1
 fi
 
-echo "Database backup created:"
+echo "Backup created:"
 echo "$BACKUP_FILE"
 REMOTE_BACKUP
-
-# ============================================================
-# 4. UPLOAD LOCAL CODE
-# ============================================================
 
 echo
 echo "6. Uploading project files..."
 
-rsync -avz \
-    --exclude ".git/" \
-    --exclude ".github/" \
-    --exclude ".venv/" \
-    --exclude "venv/" \
-    --exclude "db.sqlite3" \
-    --exclude "db.sqlite3-*" \
-    --exclude "*.sqlite3" \
-    --exclude "staticfiles/" \
-    --exclude "media/" \
-    --exclude "__pycache__/" \
-    --exclude "*.pyc" \
-    --exclude ".env" \
-    --exclude ".env.*" \
-    --exclude "*.env" \
-    --exclude ".vscode/" \
-    --exclude ".idea/" \
-    --exclude ".DS_Store" \
-    --exclude "settings.py" \
-    ./ "$VPS:$PROJECT_DIR/"
-
-# ============================================================
-# 5. UPDATE DJANGO ON THE VPS
-# ============================================================
+rsync -rtvz     --exclude ".git/"     --exclude ".github/"     --exclude ".venv/"     --exclude "venv/"     --exclude "settings.py"     --exclude "*.sqlite3*"     --exclude "staticfiles/"     --exclude "media/"     --exclude "uploads/"     --exclude "__pycache__/"     --exclude "*.pyc"     --exclude ".env"     --exclude ".env.*"     --exclude "*.env"     --exclude ".vscode/"     --exclude ".idea/"     --exclude ".DS_Store"     --exclude "deploy.sh"     ./ "$VPS:$PROJECT_DIR/"
 
 echo
-echo "7. Updating Django on the VPS..."
+echo "7. Updating Django on VPS..."
 
-ssh "$VPS" bash -s -- \
-    "$PROJECT_DIR" \
-    "$SERVICE_NAME" \
-    "$ENV_FILE" \
-    "$VENV_DIR" <<'REMOTE_DEPLOY'
+ssh "$VPS" bash -s --     "$PROJECT_DIR"     "$SERVICE_NAME"     "$ENV_FILE"     "$VENV_DIR"     "$DB_FILE" <<'REMOTE_DEPLOY'
 
 set -Eeuo pipefail
 
@@ -210,6 +136,9 @@ PROJECT_DIR="$1"
 SERVICE_NAME="$2"
 ENV_FILE="$3"
 VENV_DIR="$4"
+DB_FILE="$5"
+
+PYTHON="$VENV_DIR/bin/python"
 
 cd "$PROJECT_DIR"
 
@@ -217,77 +146,91 @@ set -a
 source "$ENV_FILE"
 set +a
 
-PYTHON="$VENV_DIR/bin/python"
+echo
+echo "Fixing production permissions..."
+
+chown root:www-data "$PROJECT_DIR"
+chmod 775 "$PROJECT_DIR"
+
+chown www-data:www-data "$DB_FILE"
+chmod 664 "$DB_FILE"
+
+if [[ -d "$PROJECT_DIR/media" ]]; then
+    chown -R www-data:www-data "$PROJECT_DIR/media"
+fi
+
+if [[ -d "$PROJECT_DIR/uploads" ]]; then
+    chown -R www-data:www-data "$PROJECT_DIR/uploads"
+fi
 
 echo
 echo "Installing dependencies..."
 
-if [[ -f "requirements.txt" ]]; then
-    "$PYTHON" -m pip install -r requirements.txt
+if [[ -f "$PROJECT_DIR/requirements.txt" ]]; then
+    "$PYTHON" -m pip install -r "$PROJECT_DIR/requirements.txt"
 else
     echo "No requirements.txt found; skipping dependency installation."
 fi
 
 echo
 echo "Running production Django check..."
-
 "$PYTHON" manage.py check
 
 echo
-echo "Applying database migrations..."
-
+echo "Applying migrations..."
 "$PYTHON" manage.py migrate --noinput
 
 echo
 echo "Collecting static files..."
-
 "$PYTHON" manage.py collectstatic --noinput
+
+chown root:www-data "$PROJECT_DIR"
+chmod 775 "$PROJECT_DIR"
+
+chown www-data:www-data "$DB_FILE"
+chmod 664 "$DB_FILE"
+
+echo
+echo "Testing production database write access..."
+
+sudo -u www-data sqlite3 "$DB_FILE" 'BEGIN IMMEDIATE; CREATE TABLE __deploy_permission_test__(x INTEGER); ROLLBACK;'
+
+echo "SQLite write test OK."
 
 echo
 echo "Restarting $SERVICE_NAME..."
-
 systemctl restart "$SERVICE_NAME"
 
 if ! systemctl is-active --quiet "$SERVICE_NAME"; then
-    echo "ERROR: The service did not start successfully."
     echo
+    echo "ERROR: $SERVICE_NAME failed to start."
     systemctl status "$SERVICE_NAME" --no-pager || true
     echo
     journalctl -u "$SERVICE_NAME" -n 80 --no-pager || true
     exit 1
 fi
 
-echo "Service is running."
+echo "$SERVICE_NAME is running."
 REMOTE_DEPLOY
 
-# ============================================================
-# 6. CHECK THE PUBLIC WEBSITE
-# ============================================================
-
 echo
-echo "8. Checking the public website..."
+echo "8. Checking public website..."
 
-# Wait briefly for Gunicorn to finish starting.
 sleep 2
 
-if ! curl \
-    --fail \
-    --silent \
-    --show-error \
-    --max-time 20 \
-    "https://$DOMAIN/" \
-    > /dev/null
+if ! curl     --fail     --silent     --show-error     --max-time 20     "https://$DOMAIN/"     > /dev/null
 then
     echo
-    echo "ERROR: Deployment commands completed, but the website check failed."
-    echo
-    echo "Inspect the service with:"
-    echo "ssh $VPS 'journalctl -u $SERVICE_NAME -n 100 --no-pager'"
+    echo "ERROR: Deployment completed, but public website check failed."
+    echo "Check logs with:"
+    echo "ssh $VPS"
+    echo "journalctl -u $SERVICE_NAME -n 100 --no-pager"
     exit 1
 fi
 
 echo
 echo "=========================================="
-echo "Deployment completed successfully"
-echo "https://$DOMAIN"
+echo "      DEPLOYMENT SUCCESSFUL"
 echo "=========================================="
+echo
+echo "https://$DOMAIN"

@@ -1,0 +1,74 @@
+{% extends "base-after-login.html" %}
+
+{% block title %}{{ profile_user.username }} · SMIC HUB{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <div class="avatar avatar-large profile-avatar">
+        {% if profile_user.profile_picture %}
+            <img class="profile-picture-img" src="{{ profile_user.profile_picture.url }}" alt="{{ profile_user.username }}">
+        {% else %}
+            {{ profile_user.username|first|upper }}
+        {% endif %}
+    </div>
+
+    <div class="profile-meta">
+        <p class="eyebrow">My Profile</p>
+        <h1>@{{ profile_user.username }}</h1>
+        {% if profile_user.bio %}
+            <p>{{ profile_user.bio|linebreaksbr }}</p>
+        {% else %}
+            <p class="muted">No bio yet.</p>
+        {% endif %}
+    </div>
+
+    <a class="button" href="{% url 'feed:edit_profile' %}">Edit profile</a>
+</div>
+
+<div class="profile-feed">
+    <div class="section-heading">
+        <h2>My Posts</h2>
+        <span class="muted">{{ posts|length }} total</span>
+    </div>
+
+    {% if posts %}
+        <div class="post-list">
+            {% for post in posts %}
+                <a href="{% url 'feed:user_post' post.id %}">
+                    <article class="post-card">
+                        <div class="post-card-topline">
+                            <span class="category-pill category-{{ post.category }}">
+                                {{ post.category|upper }}
+                            </span>
+                            <span class="muted">{{ post.created_at|date:"M j, Y · H:i" }}</span>
+                        </div>
+
+                        <h2 class="post-title">{{ post.title }}</h2>
+                        <p class="post-excerpt">{{ post.body|truncatechars:200 }}</p>
+
+                        {% if post.file_attached and post.is_image %}
+                            <div class="post-attachment">
+                                <img src="{{ post.file_attached.url }}" alt="{{ post.title }}">
+                            </div>
+                        {% endif %}
+
+                        <div class="post-footer">
+                            <span class="post-stats">
+                                <span>{{ post.like_count }} likes</span>
+                                <span>{{ post.comment_count }} replies</span>
+                            </span>
+                        </div>
+                    </article>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state compact">
+            <h3>No posts yet</h3>
+            <p>You haven't posted anything yet.</p>
+            <br>
+            <a class="button" href="{% url 'feed:create_post' %}">Create your first post</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

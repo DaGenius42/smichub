@@ -16,11 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-import feed.views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home/', include('feed.urls')),
-    path('', include('accounts.urls')),
     
+    # 让 / 直接指向 feed 首页
+    path('', include('feed.urls')),  # ← feed 的首页在 /
+    
+    # accounts 的 URL 放在 /accounts/ 下
+    path('accounts/', include('accounts.urls')),
 ]
+
+# Serve uploaded media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

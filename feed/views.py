@@ -1,38 +1,35 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from .models import Post, News, House
-from .forms import PostForm, CommentsForm
+from .models import Post, News, House, Comments, CustomUser, Vote, Price
+from .forms import PostForm, CommentsForm, ProfileForm, VoteForm
 from django.core.exceptions import PermissionDenied 
 from django.views.decorators.http import require_POST
 from django.db.models import Q
+from .forms import CustomUserForm
 
 @login_required
 def home(request):
     query = request.GET.get('q' , '').strip()
     selected_category = request.GET.get('category', '').strip()
     posts = Post.objects.select_related("author").prefetch_related("comments__author").filter(verified=True).order_by('-created_at')
-    news = News.objects.all()
-    house = House.objects.all()
     if query:
         posts = posts.filter(
             Q(title__icontains=query) | Q(body__icontains=query) | Q(author__username__icontains=query)
         )
-        news = news.filter(
-            Q(title__icontains=query) | Q(body__icontains=query)
-        )
 
     if selected_category:
         posts = posts.filter(category=selected_category)
-        news = news.filter(category=selected_category)
+
+    news = News.objects.all().order_by('-created_at')
     
     context = {
         'posts': posts,
+        'news': news,
         'query': query,
         'selected_category': selected_category,
         'categories': Post.CATEGORY_CHOICES + News.CATEGORY_CHOICES,
-        'news': news,
-        'houses': house,
     }
     return render(request, 'feed/home.html', context)
 
@@ -60,7 +57,7 @@ def create_post(request):
     if not request.user.is_authenticated:
         return redirect('accounts:login')
     if request.method == 'POST':
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)#also files for pictures
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -110,3 +107,130 @@ def like_news(request, news_id):
     else:
         news.likes.add(request.user)
     return redirect('feed:news_post', news_id=news.id)
+
+def signup(request):
+    if request.method == 'POST':
+        form = CustomUserForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return redirect('accounts:login')
+    else:
+        form = CustomUserForm()
+    return render(request, 'registrations/signup.html', {'form': form})
+
+
+@login_required
+def profile(request):
+    """Show the logged-in user's profile: bio, picture, and post history."""
+    posts = Post.objects.filter(author=request.user).order_by('-created_at')
+    context = {
+        'profile_user': request.user,
+        'posts': posts,
+    }
+    return render(request, 'feed/profile.html', context)
+
+
+@login_required
+def edit_profile(request):
+    """Edit username, bio, and profile picture."""
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('feed:profile')
+    else:
+        form = ProfileForm(instance=request.user)
+    return render(request, 'feed/edit_profile.html', {'form': form})
+
+@login_required
+def cc(request):
+    return render(request, 'feed/cc.html')
+
+@login_required
+def stuco(request):
+    news = News.objects.all().order_by('-created_at')
+    context = {
+        'news': news,
+    }
+    return render(request, 'feed/stuco.html', context)
+
+@login_required
+def cc(request):
+    votes = Vote.objects.all().order_by('-created_at')
+    prices = Price.objects.all()
+    context = {
+        'votes': votes,
+        'prices': prices,
+    }
+    return render(request, 'feed/cc.html', context)
+
+@login_required
+def notifications(request):
+    return render(request, 'feed/notifications.html')
+
+@login_required
+def house_standings(request):
+    houses = House.objects.all().order_by('-points')
+    context = {
+        'houses': houses,
+    }
+    return render(request, 'feed/house_standings.html', context)
+
+@login_required
+def create_vote(request):
+    if request.method == 'POST':
+        form = VoteForm(request.POST)
+        if form.is_valid():
+            vote = form.save(commit=False)
+            vote.save()
+            return redirect('feed:cc')
+    else:
+        form = VoteForm()
+    return render(request, 'feed/create_vote.html', {'form': form})
+
+def vote_vote(request, vote_id):
+    vote = get_object_or_404(Vote, id=vote_id)
+    if request.method == 'POST':
+        if request.user in vote.voters.all():
+            vote.voters.remove(request.user)
+        else:
+            vote.voters.add(request.user)
+        return redirect('feed:cc')
+    return redirect('feed:cc')
+
+def like_price(request, price_id):
+    price = get_object_or_404(Price, id=price_id)
+    if request.user in price.thumbs.all():
+        price.thumbs.remove(request.user)
+    else:
+        price.thumbs.add(request.user)
+    return redirect('feed:cc')
+
+def view_profile(request, username):
+    user = get_object_or_404(CustomUser, username=username)
+    posts = Post.objects.filter(author=user).order_by('-created_at')
+    context = {
+        'profile_user': user,
+        'posts': posts,
+    }
+    return render(request, 'feed/view_profile.html', context)
+
+
+@login_required
+def search_users(request):
+    """Return matching users as JSON for the navbar user-search dropdown."""
+    q = request.GET.get('q', '').strip()
+    users = CustomUser.objects.filter(username__icontains=q)[:8]
+    data = [
+        {
+            'username': u.username,
+            'bio': u.bio,
+            'avatar_url': u.profile_picture.url if u.profile_picture else None,
+            'initial': u.username[:1].upper(),
+            'profile_url': reverse('feed:view_profile', args=[u.username]),
+        }
+        for u in users
+    ]
+    return JsonResponse({'users': data})

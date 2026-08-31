@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base-after-login.html" %}
 
 {% block title %}Create Post · SMIC HUB{% endblock %}
 
@@ -7,7 +7,8 @@
     <p class="eyebrow">A place to share your thoughts</p>
     <h1>Write your post here...</h1>
 
-    <form class="stacked-form" method="post">
+    <form class="stacked-form" method="post" enctype="multipart/form-data">
+    <!-- multipart for text and other file uploads-->
         {% csrf_token %}
         {{ form.as_p }}
 

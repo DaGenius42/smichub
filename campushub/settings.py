@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!29d^t=%db&g*dbn&l2j45c4@a)flxr6o4nsj6#%vfpvqf%p59
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # dev only: allow access from any host on the LAN
 
 
 # Application definition
@@ -118,6 +118,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Media files (user uploads: photos, attachments)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -126,3 +130,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "feed:home"
 LOGOUT_REDIRECT_URL = "accounts:login"
+
+
+
+AUTH_USER_MODEL = 'feed.CustomUser'
+LOGIN_URL = '/accounts/' 

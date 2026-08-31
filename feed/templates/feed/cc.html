@@ -1,0 +1,135 @@
+{% extends "base-after-login.html" %}
+
+{% block title %}Charity Club · SMIC HUB{% endblock %}
+
+{% block content %}
+<div class="charity-page">
+    <!-- Page Header -->
+    <div class="charity-header">
+        <h1>❤️ Charity Club</h1>
+        <p class="muted">Care and Cure</p>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="charity-grid">
+        <!-- Left Column: Products + Xiao Jia -->
+        <div class="charity-left">
+            <!-- Products Section -->
+            <section class="charity-section products-section">
+                <div class="section-header">
+                    <h2>📦 Products</h2>
+                    <span class="badge">Num Num Num</span>
+                </div>
+                
+                {% if prices %}
+                    <ul class="products-list">
+                        {% for price in prices %}
+                            <li class="product-item">
+                                <div class="product-info">
+                                    <span class="product-name">{{ price.name }}</span>
+                                    <span class="product-price">¥{{ price.value }}</span>
+                                </div>
+                                <div class="product-actions">
+                                    <form method="post" action="{% url 'feed:like_price' price.id %}" class="inline-like-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="like-btn {% if user in price.thumbs.all %}liked{% endif %}">
+                                            <span class="like-emoji">👍</span>
+                                            <span class="like-count">{{ price.thumbs_count }}</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="muted">No products available.</p>
+                {% endif %}
+            </section>
+
+            <!-- Xiao Jia Section -->
+            <section class="charity-section xiaojia-section">
+                <div class="section-header">
+                    <h2>🏠 小家</h2>
+                    <span class="badge">Charity Visits</span>
+                </div>
+                <div class="xiaojia-grid">
+                    <div class="xiaojia-card">
+                        <div class="xiaojia-image">
+                            <img src="/media/cc/1.jpg" alt="小家 Photo 1" onerror="this.style.display='none'">
+                        </div>
+                        <p class="xiaojia-caption">Photo Together</p>
+                    </div>
+                    <div class="xiaojia-card">
+                        <div class="xiaojia-image">
+                            <img src="/media/cc/2.jpg" alt="小家 Photo 2" onerror="this.style.display='none'">
+                        </div>
+                        <p class="xiaojia-caption">Dish prepared</p>
+                    </div>
+                    <div class="xiaojia-card">
+                        <div class="xiaojia-image">
+                            <img src="/media/cc/3.jpg" alt="小家 Photo 3" onerror="this.style.display='none'">
+                        </div>
+                        <p class="xiaojia-caption">Dumplings</p>
+                    </div>
+                    <div class="xiaojia-card">
+                        <div class="xiaojia-image">
+                            <img src="/media/cc/4.png" alt="小家 Photo 4" onerror="this.style.display='none'">
+                        </div>
+                        <p class="xiaojia-caption">Room</p>
+                    </div>
+                    <div class="xiaojia-card">
+                        <div class="xiaojia-image">
+                            <img src="/media/cc/5.jpg" alt="小家 Photo 5" onerror="this.style.display='none'">
+                        </div>
+                        <p class="xiaojia-caption">Cooking</p>
+                    </div>
+                    <div class="xiaojia-card">
+                        <div class="xiaojia-image">
+                            <img src="/media/cc/6.jpg" alt="小家 Photo 6" onerror="this.style.display='none'">
+                        </div>
+                        <p class="xiaojia-caption">Fans</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Voting System -->
+        <aside class="charity-right">
+            <section class="charity-section voting-section">
+                <div class="section-header">
+                    <h2>🍜 Snack Wanted</h2>
+                    <a href="{% url 'feed:create_vote' %}" class="button button-small">+ New Vote</a>
+                </div>
+                
+                {% if votes %}
+                    <div class="votes-list">
+                        {% for vote in votes %}
+                            <div class="vote-item">
+                                <div class="vote-content">
+                                    <div class="vote-body-text">{{ vote.body }}</div>
+                                </div>
+                                <div class="vote-actions">
+                                    <form method="post" action="{% url 'feed:vote_vote' vote.id %}" class="inline-vote-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="vote-btn {% if user in vote.voters.all %}liked{% endif %}">
+                                            <span class="vote-emoji">👍</span>
+                                            <span class="vote-count">{{ vote.voters.count }}</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="muted">No votes yet. Vote for your choice of snack!</p>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state compact">
+                        <p>No votes available.</p>
+                        <a href="{% url 'feed:create_vote' %}" class="button button-small" style="margin-top: 12px;">Create Vote</a>
+                    </div>
+                {% endif %}
+            </section>
+        </aside>
+    </div>
+</div>
+{% endblock %}

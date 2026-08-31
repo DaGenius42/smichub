@@ -1,0 +1,23 @@
+{% extends "base-after-login.html" %}
+
+{% block title %}Create Vote · SMIC HUB{% endblock %}
+
+{% block content %}
+<section class="form-card narrow-card">
+    <h1>Create a Vote</h1>
+
+    <form class="stacked-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="form-actions">
+            <button class="button" type="submit">
+                Create Vote
+            </button>
+            <a class="text-action" href="{% url 'feed:cc' %}">
+                Cancel
+            </a>
+        </div>
+    </form>
+</section>
+{% endblock %}

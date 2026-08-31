@@ -203,7 +203,6 @@ select {
 }
 
 .content-grid {
-    margin-top: 34px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 290px;
     gap: 28px;
@@ -256,6 +255,11 @@ select:focus {
     font-weight: 700;
 }
 
+.clear-link {
+    display: inline-block;
+    margin-top: 12px;
+}
+
 .section-heading {
     margin: 34px 0 16px;
     display: flex;
@@ -293,6 +297,7 @@ select:focus {
 .post-card {
     padding: 24px;
     border-radius: var(--radius-medium);
+    min-width: 0; /* allow long unbroken words to wrap instead of overflowing */
     transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
@@ -356,10 +361,18 @@ select:focus {
     border-radius: 50%;
     display: grid;
     place-items: center;
+    overflow: hidden;
     background: #20263a;
     color: white;
     font-size: 0.8rem;
     font-weight: 800;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .avatar-large {
@@ -416,11 +429,26 @@ select:focus {
     padding: 22px;
 }
 
+.detail-back {
+    width: min(1080px, 100%);
+    margin: 0 auto 14px;
+}
+
+.detail-back a {
+    display: inline-flex;
+    align-items: center;
+}
+
 .detail-layout {
-    width: min(850px, 100%);
+    width: min(1080px, 100%);
     margin: 0 auto;
-    display: grid;
-    gap: 20px;
+    /* display: grid;
+    gap: 20px; */
+    /* .detail-layout { */
+    display: flex;
+    gap: 2.5rem; /* Adds space between the post and comments */
+    align-items: flex-start; /* Aligns items to the top */
+
 }
 
 .detail-card,
@@ -430,13 +458,23 @@ select:focus {
     border-radius: var(--radius-large);
 }
 
-.detail-card {
-    padding: clamp(28px, 5vw, 52px);
+/* Give the detail cards breathing room inside */
+.detail-card,
+.comments-card {
+    padding: clamp(22px, 4vw, 40px);
 }
+
+/* Make the post content take up the remaining space */
+.detail-card {
+    flex: 1;
+    min-width: 0; /* allow the card to shrink so huge images can't overflow */
+}
+
+
 
 .detail-card h1 {
     margin-top: 18px;
-    font-size: clamp(2rem, 4vw, 3.3rem);
+    font-size: clamp(1.5rem, 2.4vw, 2.4rem);
 }
 
 .detail-card > .author-link {
@@ -452,7 +490,26 @@ select:focus {
     margin: 0 0 1em;
 }
 
+/* Auto-wrap long text / long URLs so nothing overflows the card */
+.post-title,
+.post-excerpt,
+.post-body,
+.detail-card h1,
+.profile-header h1,
+.user-info .username,
+.profile-meta p,
+.comment,
+.news-list a,
+.team-role,
+.team-name {
+    overflow-wrap: anywhere;
+    word-wrap: anywhere;
+    word-break: break-word;
+}
+
 .detail-actions {
+    width: min(1080px, 100%);
+    margin: 0 auto;
     gap: 18px;
     margin-top: 34px;
     padding-top: 22px;
@@ -463,13 +520,19 @@ select:focus {
     margin: 0;
 }
 
+.detail-actions .text-action {
+    margin-left: auto;
+}
+
 .danger-link {
     color: var(--danger);
     font-weight: 700;
 }
 
+/* Give the comments section a fixed width, for example */
 .comments-card {
-    padding: clamp(24px, 4vw, 38px);
+    width: 350px;
+    /* Or use flex-basis: 350px; */
 }
 
 .comments-card .section-heading {
@@ -505,6 +568,10 @@ select:focus {
 .comment-form {
     padding-bottom: 24px;
     border-bottom: 1px solid var(--border);
+}
+
+.comment-form .button {
+    margin-top: 14px;
 }
 
 .comment-list {
@@ -576,6 +643,18 @@ select:focus {
     width: 82px;
     height: 82px;
     font-size: 1.8rem;
+    overflow: hidden;
+}
+
+.profile-picture-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-meta {
+    flex: 1;
+    min-width: 0; /* allow long bio words to wrap */
 }
 
 .profile-header h1 {
@@ -595,6 +674,13 @@ select:focus {
     margin-top: 0;
 }
 
+.news-link{
+    color: var(--text);
+}
+.news-link:hover{
+    color: var(--brand);
+}
+
 @media (max-width: 820px) {
     .main-nav {
         gap: 12px;
@@ -610,12 +696,28 @@ select:focus {
     }
     .content-grid {
         grid-template-columns: 1fr;
+        gap: 22px;
+    }
+    .section-heading {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
     }
     .sidebar-card {
         position: static;
     }
+    .right-sidebar {
+        gap: 20px;
+    }
     .filter-bar {
         grid-template-columns: 1fr 1fr;
+    }
+    .detail-layout {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .comments-card {
+        width: 100%;
     }
 }
 
@@ -625,10 +727,7 @@ select:focus {
         width: min(100% - 24px, var(--page-width));
     }
     .page-shell {
-        padding-top: 24px;
-    }
-    .brand span:last-child {
-        display: none;
+        padding: 20px 0 48px;
     }
     .filter-bar {
         grid-template-columns: 1fr;
@@ -642,7 +741,29 @@ select:focus {
         border-radius: 16px;
     }
     .hero-panel {
-        padding: 25px;
+        padding: 22px;
+    }
+    .post-card {
+        padding: 18px;
+    }
+    .sidebar-card {
+        padding: 18px;
+    }
+    .profile-header {
+        padding: 22px;
+    }
+    .profile-feed {
+        padding: 20px;
+    }
+    .create-post-cta {
+        padding: 14px 16px;
+    }
+    .post-title {
+        font-size: 1.12rem;
+    }
+    .button,
+    .nav-button {
+        min-height: 44px;
     }
     .post-footer,
     .post-card-topline,
@@ -653,6 +774,50 @@ select:focus {
     .profile-header {
         align-items: flex-start;
         flex-direction: column;
+    }
+    .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+}
+
+/* Small phones */
+@media (max-width: 420px) {
+    .detail-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .detail-actions .text-action {
+        margin-left: 0;
+    }
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .form-actions .button {
+        width: 100%;
+    }
+    .form-actions .text-action {
+        align-self: center;
+        text-align: center;
+    }
+    .empty-state,
+    .login-callout {
+        padding: 22px;
+    }
+    .avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.72rem;
+    }
+    .house-image-frame {
+        width: 104px;
+        height: 104px;
+    }
+    .house-name-label {
+        font-size: 1.05rem;
     }
 }
 
@@ -746,4 +911,851 @@ select:focus {
 }
 @media (max-width: 520px) {
     .house-grid-four { grid-template-columns: 1fr; }
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* space between the two cards */
+}
+
+.sidebar-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.search-card {
+    /* Optional: make search card slightly distinct */
+    border-top: 3px solid #6366f1; /* purple accent */
+}
+
+.portals-card {
+    /* Optional: make portals card slightly distinct */
+    border-top: 3px solid #10b981; /* green accent */
+}
+
+/* ============= HOMEPAGE: RIGHT SIDEBAR + CTA ============= */
+.right-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: stretch;
+}
+
+/* Sidebar cards shouldn't stick while scrolling now that several are stacked */
+.right-sidebar .sidebar-card {
+    position: static;
+}
+
+/* Create-post call-to-action card (top of the feed column) */
+.create-post-cta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding: 16px 20px;
+    border: 1px solid var(--brand);
+    border-radius: var(--radius-medium);
+    background: linear-gradient(135deg, var(--brand-soft) 0%, #ffffff 65%);
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.12);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.create-post-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(79, 70, 229, 0.18);
+}
+
+.cta-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.cta-copy {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cta-copy strong {
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+}
+
+.cta-copy .muted {
+    font-size: 0.86rem;
+}
+
+.cta-arrow {
+    color: var(--brand);
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+/* Search card */
+.search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.button-full {
+    width: 100%;
+}
+
+/* House standings (compact rows) */
+.house-standings {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.house-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-soft);
+}
+
+.house-dot {
+    width: 12px;
+    height: 12px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+}
+
+.house-row-name {
+    flex: 1;
+    font-weight: 700;
+}
+
+.house-row-points {
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+.house-blue .house-dot { background: #0066ff; }
+.house-green .house-dot { background: #00b840; }
+.house-red .house-dot { background: var(--danger); }
+.house-yellow .house-dot { background: #ffbc00; }
+
+.house-blue .house-row-points { color: #0066ff; }
+.house-green .house-row-points { color: #00b840; }
+.house-red .house-row-points { color: var(--danger); }
+.house-yellow .house-row-points { color: #ffbc00; }
+
+/* News card list */
+.news-list {
+    list-style: none;
+    margin: 14px 0 0;
+    padding-left: 0;
+}
+
+.news-list li + li {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.news-list a {
+    color: var(--text);
+    font-weight: 650;
+}
+
+.news-list a:hover {
+    color: var(--brand);
+}
+
+.news-list .muted {
+    font-size: 0.8rem;
+}
+
+.news-list a.news-link {
+    color: var(--muted);
+    font-weight: 650;
+}
+
+.news-list a.news-link:hover {
+    color: var(--brand);
+}
+
+/* ============= STUCO OUR TEAM ============= */
+.team-card h3 {
+    margin: 6px 0 14px;
+}
+
+.team-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.team-member {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-soft);
+}
+
+.team-badge {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+}
+
+.team-badge svg {
+    width: 18px;
+    height: 18px;
+}
+
+.team-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.team-role {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.team-name {
+    font-size: 0.82rem;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.team-badge.house-badge-red { background: #fde8e8; color: #dc2626; }
+.team-badge.house-badge-yellow { background: #fef9c3; color: #ca8a04; }
+.team-badge.house-badge-green { background: #dcfce7; color: #16a34a; }
+.team-badge.house-badge-blue { background: #dbeafe; color: #2563eb; }
+
+/* ============= INLINE SVG ICONS ============= */
+.cta-icon svg,
+.cta-arrow svg {
+    vertical-align: middle;
+}
+
+.icon-left {
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.icon-right {
+    vertical-align: middle;
+    margin-left: 6px;
+}
+
+.teacher-badge {
+    vertical-align: middle;
+}
+
+.portals-card h3 svg,
+.portals-card .clean-list a svg {
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+
+/* File Attachment Styles */
+.file-attachment {
+    margin: 20px 0;
+    padding: 10px 0;
+    border-top: 1px solid var(--border-color, #e5e7eb);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.file-attachment-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 16px;
+    background: var(--bg-secondary, #f9fafb);
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    transition: all 0.2s;
+}
+
+.file-attachment-card:hover {
+    background: var(--bg-hover, #f3f4f6);
+}
+
+.file-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.file-name {
+    font-weight: 500;
+    color: var(--text-primary, #111827);
+    text-decoration: none;
+}
+
+.file-name:hover {
+    text-decoration: underline;
+    color: var(--link-color, #2563eb);
+}
+
+.file-size {
+    font-size: 0.8rem;
+    color: var(--text-muted, #6b7280);
+}
+
+.download-button {
+    color: var(--text-secondary, #4b5563);
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.download-button:hover {
+    background: var(--bg-primary, #ffffff);
+    color: var(--link-color, #2563eb);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Photo preview for post attachments */
+.post-attachment {
+    margin-top: 18px;
+}
+
+.post-attachment img {
+    display: block;
+    width: 100%;
+    max-height: 90vw;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-soft);
+}
+
+/* On the post detail page, show the whole picture scaled down to fit */
+/* Desktop: image fills the full detail card width */
+.detail-card .post-attachment img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    /* max-height: 70vh; */
+    object-fit: contain;
+    margin: 0 auto;
+}
+
+/* On phones, size the detail-page image to ~90% of the screen width,
+   breaking out of the card padding but leaving small, even side margins */
+@media (max-width: 768px) {
+    .detail-card .post-attachment img {
+        width: 90vw;
+        max-width: none;
+        margin: 0 calc(50% - 45vw);
+    }
+    .post-attachment img {
+    display: block;
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    /* border-radius: 12px; */
+    border: 1px hidden var(--border);
+    background: var(--surface);
+    }
+
+}
+
+.standings-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.houses-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+.house-card {
+    text-align: center;
+    background: white;
+    border-radius: 16px;
+    padding: 30px 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.house-image {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #e0e0e0;
+}
+
+.house-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.house-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 12px 0 8px;
+}
+
+.house-points {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #2d3748;
+}
+
+/* House Colors */
+.house-blue .house-name {
+    color: #3498db;
+}
+.house-blue .house-image {
+    border-color: #3498db;
+}
+
+.house-green .house-name {
+    color: #2ecc71;
+}
+.house-green .house-image {
+    border-color: #2ecc71;
+}
+
+.house-red .house-name {
+    color: #e74c3c;
+}
+.house-red .house-image {
+    border-color: #e74c3c;
+}
+
+.house-yellow .house-name {
+    color: #f1c40f;
+}
+.house-yellow .house-image {
+    border-color: #f1c40f;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .houses-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .houses-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============= CHARITY CLUB STYLES ============= */
+.charity-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.charity-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.charity-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.charity-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 28px;
+    align-items: start;
+}
+
+.charity-left {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.charity-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-large);
+    padding: 24px;
+    box-shadow: 0 7px 24px rgba(36, 45, 78, 0.045);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    letter-spacing: -0.02em;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Products List */
+.products-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.products-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 160ms ease;
+    border-radius: 8px;
+}
+
+.products-list li:last-child {
+    border-bottom: none;
+}
+
+.products-list li:hover {
+    background: var(--surface-soft);
+}
+
+.products-list .product-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.products-list .product-price {
+    font-weight: 700;
+    color: var(--brand);
+    font-size: 1.05rem;
+}
+
+/* Xiao Jia */
+.xiaojia-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.xiaojia-card {
+    text-align: center;
+}
+
+.xiaojia-image {
+    width: 100%;
+    height: 150px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--border);
+}
+
+.xiaojia-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.xiaojia-placeholder {
+    font-size: 2rem;
+    color: var(--muted);
+}
+
+.xiaojia-caption {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 6px;
+}
+
+/* Voting Section */
+.voting-section {
+    position: sticky;
+    top: 96px;
+}
+
+.votes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.vote-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+    background: var(--surface-soft);
+    gap: 12px;
+    transition: background 160ms ease;
+}
+
+.vote-item:hover {
+    background: var(--brand-soft);
+}
+
+.vote-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.vote-body-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    word-break: break-word;
+}
+
+.vote-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    flex-wrap: wrap;
+}
+
+.vote-category-tag {
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    padding: 1px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.vote-actions {
+    flex-shrink: 0;
+}
+
+.inline-vote-form {
+    margin: 0;
+    display: inline;
+}
+
+.vote-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 160ms ease;
+    font-size: 0.9rem;
+}
+
+.vote-btn:hover {
+    border-color: var(--brand);
+    background: var(--brand-soft);
+    transform: scale(1.05);
+}
+
+.vote-btn .vote-emoji {
+    font-size: 0.9rem;
+}
+
+.vote-btn .vote-count {
+    font-weight: 700;
+    min-width: 16px;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .charity-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .voting-section {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .charity-header h1 {
+        font-size: 2rem;
+    }
+    
+    .xiaojia-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .vote-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .vote-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .xiaojia-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charity-section {
+        padding: 16px;
+    }
+    
+    .products-list li {
+        padding: 10px 12px;
+    }
+}
+/* Product item with like button */
+/* Product item with like button */
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 160ms ease;
+    border-radius: 8px;
+}
+
+.product-item:hover {
+    background: var(--surface-soft);
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+    gap: 380px;
+    flex: 1;
+}
+
+.product-name {
+    font-weight: 600;
+    font-size: 1rem;
+    min-width: 120px;  /* ← Added to keep name from being squished */
+}
+
+.product-price {
+    font-weight: 700;
+    color: var(--brand);
+    font-size: 1.05rem;
+    min-width: 60px;  /* ← Added to keep price aligned */
+}
+
+.product-actions {
+    flex-shrink: 0;
+}
+
+/* Like button - same for products and votes */
+.like-btn,
+.vote-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    background: var(--surface);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 160ms ease;
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.like-btn:hover,
+.vote-btn:hover {
+    border-color: var(--brand);
+    background: var(--brand-soft);
+    transform: scale(1.05);
+}
+
+/* Blue style when liked */
+.like-btn.liked,
+.vote-btn.liked {
+    border-color: #3b82f6;
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.like-btn.liked:hover,
+.vote-btn.liked:hover {
+    border-color: #2563eb;
+    background: #bfdbfe;
+    color: #1e40af;
+}
+
+.like-btn .like-emoji,
+.vote-btn .vote-emoji {
+    font-size: 0.9rem;
+}
+
+.like-btn .like-count,
+.vote-btn .vote-count {
+    font-weight: 700;
+    min-width: 16px;
+    text-align: center;
+}
+
+/* Products list container */
+.products-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.products-list .muted {
+    padding: 20px;
+    text-align: center;
 }

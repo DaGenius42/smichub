@@ -1,0 +1,56 @@
+{% load static %}
+
+<div class="section-heading">
+    <div>
+        <h2>Community feed</h2>
+    </div>
+    <span class="muted">{{ posts|length }} results</span>
+</div>
+
+<div class="post-list">
+    {% for post in posts %}
+        {% if post.verified %}
+            <a href="{% url 'feed:user_post' post.id %}">
+                <article class="post-card"
+                    {% if post.author.is_teacher %}
+                        style="background:#9df2ff;"
+                    {% endif %}
+                >
+                    <div class="post-card-topline">
+                        <span class="category-pill category-{{ post.category }}">
+                            {{ post.category | upper }}
+                        </span>
+                        <span class="muted">{{ post.created_at | date:"M / j / g" }}</span>
+                    </div>
+
+                    <h2 class="post-title">
+                        {{ post.title }}
+                    </h2>
+
+                    <p class="post-excerpt">
+                        {{ post.body | truncatechars:600 }}
+                    </p>
+
+                    <div class="post-footer">
+                        <span class="author-link">
+                            <span class="avatar">
+                                {% if post.author.profile_picture %}
+                                    <img src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+                                {% else %}
+                                    {{ post.author.username|first|upper }}
+                                {% endif %}
+                            </span>
+                            @{{ post.author.username }}
+                        </span>
+                        <div class="post-stats">
+                            <span>{{ post.like_count }} likes</span>
+                            <span>{{ post.comment_count }} replies</span>
+                        </div>
+                    </div>
+                </article>
+            </a>
+        {% endif %}
+    {% empty %}
+        <div class="empty-state"><h3>No posts available.</h3><p>Be the first to post!</p></div>
+    {% endfor %}
+</div>

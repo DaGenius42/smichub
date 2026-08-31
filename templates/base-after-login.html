@@ -1,0 +1,1011 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SMICHUB{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'feed/css/style.css' %}">
+    <style>
+        /* Reset and base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        /* Top Header / Nav Bar - Light Theme */
+        .site-header {
+            background-color: #ffffff;
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-shell {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1a1a2e;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-mark {
+            background: #4f46e5;
+            color: white;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .main-nav a {
+            color: #4a5568;
+            text-decoration: none;
+            transition: color 0.2s, background 0.2s;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+        }
+
+        .main-nav a:hover {
+            color: #1a1a2e;
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .main-nav .muted {
+            color: #718096;
+            font-size: 0.9rem;
+            font-weight: 400;
+            padding: 0.4rem 0.75rem;
+        }
+
+        .inline-form {
+            display: inline;
+        }
+
+        .nav-button {
+            background: none;
+            border: none;
+            color: #4a5568;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-button:hover {
+            color: #1a1a2e;
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        /* Nav search bar */
+        .nav-search-wrapper {
+            flex: 1;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .nav-search-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 6px 5px 14px;
+            background: #f0f2f7;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .nav-search-form:focus-within {
+            background: #ffffff;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .nav-search-icon {
+            width: 16px;
+            height: 16px;
+            flex: 0 0 auto;
+            color: #9aa1b5;
+            stroke: currentColor;
+        }
+
+        .nav-search-input {
+            flex: 1;
+            min-width: 0;
+            width: auto;
+            min-height: 0;
+            padding: 6px 0;
+            border: none;
+            background: transparent;
+            font-size: 0.92rem;
+            color: #1a1a2e;
+        }
+
+        .nav-search-input::placeholder {
+            color: #9aa1b5;
+        }
+
+        .nav-search-input:focus {
+            border: none;
+            box-shadow: none;
+        }
+
+        .nav-search-btn {
+            display: grid;
+            place-items: center;
+            width: 30px;
+            height: 30px;
+            flex: 0 0 auto;
+            border: none;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+        .nav-search-btn:hover {
+            background: #4338ca;
+            transform: scale(1.06);
+        }
+
+        .nav-search-btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .nav-clear-btn {
+            display: grid;
+            place-items: center;
+            width: 24px;
+            height: 24px;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            color: #9aa1b5;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .nav-clear-btn:hover {
+            background: rgba(0, 0, 0, 0.06);
+            color: #4a5568;
+        }
+
+        .nav-clear-btn svg {
+            width: 13px;
+            height: 13px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* User search dropdown */
+        .nav-search-dropdown {
+            position: relative;
+        }
+
+        .nav-search-results {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            z-index: 1100;
+        }
+
+        .nav-search-results-list {
+            list-style: none;
+            margin: 0;
+            padding: 6px;
+        }
+
+        .nav-search-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .nav-search-user:hover {
+            background: rgba(79, 70, 229, 0.08);
+        }
+
+        .nav-search-user .avatar {
+            width: 30px;
+            height: 30px;
+            flex: 0 0 auto;
+            overflow: hidden;
+        }
+
+        .nav-search-user-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .nav-search-user-name {
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .nav-search-user-bio {
+            font-size: 0.78rem;
+            color: #718096;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-search-empty {
+            margin: 0;
+            padding: 12px 14px;
+            color: #718096;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-search-wrapper {
+                max-width: 190px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-search-wrapper {
+                display: none;
+            }
+        }
+
+        .button-small {
+            background: #4f46e5;
+            color: white !important;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.15s;
+        }
+
+        .button-small:hover {
+            background: #4338ca;
+            color: white !important;
+            transform: translateY(-1px);
+        }
+
+        /* Layout with sidebar */
+        .app-container {
+            display: flex;
+            min-height: calc(100vh - 64px);
+        }
+
+        /* Sidebar styles - Light Theme */
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            color: #1a1a2e;
+            padding: 1.5rem 1rem;
+            position: fixed;
+            height: calc(100vh - 64px);
+            left: 0;
+            top: 64px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 0 0.75rem 1.25rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #1a1a2e;
+        }
+
+        .sidebar-brand svg {
+            flex-shrink: 0;
+            color: #4f46e5;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 2rem;
+            background-color: #f0f2f5;
+            min-height: calc(100vh - 64px);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.15rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.65rem 0.75rem;
+            color: #4a5568;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            gap: 12px;
+            font-size: 0.92rem;
+            font-weight: 500;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: rgba(79, 70, 229, 0.08);
+            color: #1a1a2e;
+        }
+
+        .sidebar-nav a.active {
+            background-color: rgba(79, 70, 229, 0.12);
+            color: #4f46e5;
+        }
+
+        .sidebar-nav a.active .icon svg {
+            stroke: #4f46e5;
+        }
+
+        .sidebar-nav .icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-nav .icon svg {
+            width: 19px;
+            height: 19px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .user-info {
+            padding: 0.5rem 0.75rem;
+            color: #4a5568;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .user-info:hover {
+            color: #4f46e5;
+        }
+
+        .user-info .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4f46e5;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            color: white;
+            font-weight: 700;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .user-info .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .user-info .username {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        .user-info .icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-info .icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Logout link in sidebar footer */
+        .sidebar-footer .sidebar-nav {
+            margin-top: 0.25rem;
+        }
+
+        .sidebar-footer .sidebar-nav a {
+            color: #e53e3e;
+        }
+
+        .sidebar-footer .sidebar-nav a:hover {
+            background-color: rgba(229, 62, 62, 0.08);
+            color: #c53030;
+        }
+
+        /* Bottom navigation (mobile only) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: calc(60px + env(safe-area-inset-bottom, 0px));
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            background: #ffffff;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+            z-index: 1002;
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            color: #4a5568;
+            text-decoration: none;
+            font-size: 0.62rem;
+            font-weight: 600;
+            padding: 6px 2px;
+            transition: color 0.15s;
+        }
+
+        .bottom-nav-item:hover {
+            color: #4f46e5;
+        }
+
+        .bottom-nav-icon {
+            width: 22px;
+            height: 22px;
+            display: grid;
+            place-items: center;
+        }
+
+        .bottom-nav-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .bottom-nav-item.active {
+            color: #4f46e5;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .site-header {
+                padding: 0 1rem;
+            }
+
+            .sidebar {
+                width: 200px;
+                padding: 1rem;
+                top: 60px;
+                height: calc(100vh - 60px);
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 1rem;
+            }
+
+            .main-nav a:not(.button-small) {
+                font-size: 0.85rem;
+                padding: 0.3rem 0.5rem;
+            }
+
+            .brand {
+                font-size: 1rem;
+            }
+
+            .main-nav {
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 60px;
+                padding: 0.75rem 0.5rem;
+                top: 56px;
+                height: calc(100vh - 56px);
+            }
+
+            .sidebar-nav a span:not(.icon),
+            .user-info .username {
+                display: none;
+            }
+
+            .sidebar-nav a {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+
+            .sidebar-nav .icon {
+                margin: 0;
+            }
+
+            .main-content {
+                margin-left: 60px;
+                padding: 1rem;
+            }
+
+            .user-info {
+                justify-content: center;
+            }
+
+            .user-info .avatar {
+                width: 28px;
+                height: 28px;
+                font-size: 0.65rem;
+            }
+
+            .main-nav .muted {
+                display: none;
+            }
+
+            .site-header {
+                padding: 0 0.75rem;
+                height: 56px;
+            }
+
+            .main-nav {
+                gap: 0.5rem;
+            }
+
+            .main-nav a:not(.button-small) {
+                font-size: 0.8rem;
+                padding: 0.25rem 0.4rem;
+            }
+
+            .nav-button {
+                font-size: 0.8rem;
+                padding: 0.25rem 0.4rem;
+            }
+
+            .button-small {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.7rem;
+            }
+
+            .sidebar-footer .sidebar-nav a span:not(.icon) {
+                display: none;
+            }
+        }
+
+        /* Mobile: switch from left sidebar to bottom navigation */
+        @media (max-width: 820px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding-bottom: 84px;
+            }
+            .bottom-nav {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar - Light Theme -->
+    <header class="site-header">
+        <div class="nav-shell">
+            <a class="brand" href="{% url 'feed:home' %}">
+                <span class="brand-mark">S</span>
+                <span>SMIC HUB</span>
+            </a>
+            <div class="nav-search-wrapper">
+                <div class="nav-search-dropdown">
+                    <form method="get" action="{% url 'feed:home' %}" class="nav-search-form" id="nav-search-form">
+                        <svg class="nav-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input
+                            type="search"
+                            name="q"
+                            value="{{ query }}"
+                            placeholder="Search users..."
+                            class="nav-search-input"
+                            id="nav-search-input"
+                            autocomplete="off"
+                        >
+                        <button type="submit" class="nav-search-btn" aria-label="Search">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </button>
+                    </form>
+                    <div class="nav-search-results" id="nav-search-results" hidden>
+                        <ul class="nav-search-results-list" id="nav-search-results-list"></ul>
+                        <p class="nav-search-empty" id="nav-search-empty">No users found</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="main-nav">
+                <a href="{% url 'feed:home' %}">Explore</a>
+
+                {% if user.is_authenticated %}
+                    <span class="muted">@{{ user.username }}</span>
+                    <form action="{% url 'accounts:logout' %}" method="post" class="inline-form">
+                        {% csrf_token %}
+                        <button class="nav-button" type="submit">Log out</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}">Log in</a>
+                    <a class="button-small" href="{% url 'accounts:signup' %}">Join</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Layout with Sidebar -->
+    <div class="app-container">
+        <!-- Sidebar Navigation - Light Theme -->
+        <nav class="sidebar">
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="{% url 'feed:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                        </span>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'feed:profile' %}" class="{% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'edit_profile' %}active{% endif %}">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </span>
+                        Profile
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'feed:create_post' %}" class="{% if 'create' in request.path %}active{% endif %}">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </span>
+                        New Post
+                    </a>
+                </li>
+                <li>
+                    <a href="{%url 'feed:stuco' %}">
+                        <span class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="64" height="64" viewBox="0 0 48 48" style="color: rgb(74, 85, 101); opacity: 1; transform: rotate(0deg);"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"><path d="M12.119 45s-.438-23.96.368-32.956a3.43 3.43 0 0 1 .758-1.88C16.927 5.668 22.132 3 23.872 3s7.173 2.668 10.882 7.165c.442.536.697 1.188.76 1.88c.805 8.994.367 32.955.367 32.955"></path><path d="M12.195 17.18q-2.028.07-3.435.14a3.68 3.68 0 0 0-3.524 3.516C5.12 23.18 5 26.767 5 31.6V45m30.805-27.82q2.028.069 3.435.141a3.68 3.68 0 0 1 3.523 3.515C42.88 23.18 43 26.767 43 31.6V45M21 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0m7 33v-8.001C28 34.789 26.21 33 24 33s-4 1.79-4 3.999V45m0-26v2m0 5v2m8-9v2m0 5v2m17 17H3"></path></g></svg>
+                        </span>
+                        StuCo News
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'feed:cc' %}">
+                        <span class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                            </svg>
+                        </span>
+                        Charity Club
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'feed:house_standings' %}">
+                        <span class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="6"/>
+                                <path d="M8.5 14L5 22L12 18L19 22L15.5 14"/>
+                            </svg>
+                        </span>
+                        House Standings
+                    </a>
+                </li>
+                <!-- <li>
+                    <a href="{% url 'feed:notifications' %}">
+                        <span class="icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 16 16" style="color: rgb(74, 85, 101); opacity: 1; transform: rotate(0deg);"><path fill="currentColor" fill-rule="evenodd" d="M8 1a1 1 0 0 0-1 1v.1A5 5 0 0 0 3 7v4l-1.205 1.328c-.583.643-.127 1.672.74 1.672h3.733a2 2 0 0 0 3.464 0h3.733c.867 0 1.323-1.03.74-1.672L13 11V7a5 5 0 0 0-4-4.9V2a1 1 0 0 0-1-1M4.5 11.58l-.39.428l-.446.492h8.672l-.447-.492l-.389-.429V7a3.5 3.5 0 1 0-7 0z" clip-rule="evenodd"></path></svg>                        </span>
+                        Notifications
+                    </a>
+                </li> -->
+            </ul>
+
+            <div class="sidebar-footer">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'feed:profile' %}" class="user-info">
+                        <div class="avatar">
+                            {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}">
+                            {% else %}
+                                {{ user.username|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <span class="username">{{ user.username }}</span>
+                    </a>
+                    <ul class="sidebar-nav">
+                        <li>
+                            <a href="{% url 'accounts:logout' %}">
+                                <span class="icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                </span>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                {% else %}
+                    <div class="user-info">
+                        <div class="avatar">G</div>
+                        <span>Guest</span>
+                    </div>
+                    <ul class="sidebar-nav">
+                        <li>
+                            <a href="{% url 'accounts:login' %}">
+                                <span class="icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M11 16l-4-4m0 0l4-4m-4 4h14m-6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                </span>
+                                <span>Log in</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'accounts:signup' %}">
+                                <span class="icon">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                    </svg>
+                                </span>
+                                <span>Join</span>
+                            </a>
+                        </li>
+                    </ul>
+                {% endif %}
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Bottom Navigation (mobile only) -->
+    <nav class="bottom-nav">
+        <a href="{% url 'feed:home' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            <span class="bottom-nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+            </span>
+            <span class="bottom-nav-label">Home</span>
+        </a>
+        <a href="{% url 'feed:create_post' %}" class="bottom-nav-item {% if 'create' in request.path %}active{% endif %}">
+            <span class="bottom-nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            </span>
+            <span class="bottom-nav-label">New</span>
+        </a>
+        <a href="{% url 'feed:profile' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'edit_profile' %}active{% endif %}">
+            <span class="bottom-nav-icon">
+                <svg viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+            </span>
+            <span class="bottom-nav-label">Profile</span>
+        </a>
+        <a href="{% url 'feed:stuco' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'stuco' %}active{% endif %}">
+            <span class="bottom-nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.1 5.5.8-4 3.9.9 5.5L12 16l-4.9 2.6.9-5.5-4-3.9 5.5-.8z"/></svg>
+            </span>
+            <span class="bottom-nav-label">StuCo</span>
+        </a>
+        <a href="{% url 'feed:cc' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'cc' %}active{% endif %}">
+            <span class="bottom-nav-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            </span>
+            <span class="bottom-nav-label">CC</span>
+        </a>
+        <a href="{% url 'feed:house_standings' %}" class="bottom-nav-item {% if request.resolver_match.url_name == 'house_standings' %}active{% endif %}">
+            <span class="bottom-nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M8.5 14L5 22L12 18L19 22L15.5 14"/></svg>
+            </span>
+            <span class="bottom-nav-label">Houses</span>
+        </a>
+    </nav>
+    <script>
+    (function () {
+        var input = document.getElementById('nav-search-input');
+        var results = document.getElementById('nav-search-results');
+        var list = document.getElementById('nav-search-results-list');
+        var empty = document.getElementById('nav-search-empty');
+        var wrap = document.getElementById('nav-search-wrapper');
+
+        var debounceTimer = null;
+
+        function escapeHtml(s) {
+            var d = document.createElement('div');
+            d.textContent = s == null ? '' : String(s);
+            return d.innerHTML;
+        }
+
+        function setAvatar(el, u) {
+            el.innerHTML = '';
+            if (u.avatar_url) {
+                var img = document.createElement('img');
+                img.src = u.avatar_url;
+                img.alt = u.username;
+                img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+                el.appendChild(img);
+            } else {
+                el.textContent = u.initial || '?';
+            }
+        }
+
+        function renderUsers(users) {
+            list.innerHTML = '';
+            if (!users.length) {
+                empty.hidden = false;
+                return;
+            }
+            empty.hidden = true;
+            users.forEach(function (u) {
+                var li = document.createElement('li');
+                li.className = 'nav-search-user';
+                li.innerHTML =
+                    '<span class="avatar"></span>' +
+                    '<span class="nav-search-user-info">' +
+                        '<span class="nav-search-user-name">@' + escapeHtml(u.username) + '</span>' +
+                        '<span class="nav-search-user-bio">' + escapeHtml(u.bio) + '</span>' +
+                    '</span>';
+                setAvatar(li.querySelector('.avatar'), u);
+                li.addEventListener('click', function () {
+                    window.location.href = u.profile_url;
+                });
+                list.appendChild(li);
+            });
+        }
+
+        function fetchUsers(q) {
+            if (!q.trim()) {
+                renderUsers([]);
+                results.hidden = false;
+                return;
+            }
+            fetch('/users/search/?q=' + encodeURIComponent(q.trim()))
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    renderUsers(data.users || []);
+                    results.hidden = false;
+                })
+                .catch(function () {
+                    results.hidden = true;
+                });
+        }
+
+        input.addEventListener('focus', function () {
+            fetchUsers(input.value);
+        });
+
+        input.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                fetchUsers(input.value);
+            }, 150);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!wrap.contains(e.target)) {
+                results.hidden = true;
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                results.hidden = true;
+            }
+        });
+    })();
+    </script>
+</body>
+</html>

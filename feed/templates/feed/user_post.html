@@ -1,8 +1,15 @@
-{% extends "base.html" %}
+{% extends "base-after-login.html" %}
 
-{% block title %}{{ post.title }} · CampusConnect{% endblock %}
+{% block title %}{{ post.title }} · SMIC HUB{% endblock %}
 
 {% block content %}
+<div class="detail-back">
+    <a class="text-action" href="{% url 'feed:home' %}">
+        <svg class="icon-left" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        Back
+    </a>
+</div>
+
 <div class="detail-layout">
     <article class="detail-card">
         <div class="post-card-topline">
@@ -14,47 +21,91 @@
             </span>
         </div>
 
-        <h1>{{ post.title }}</h1>
+        
 
         <div class="author-link">
             <span class="avatar avatar-large">
-                {{ post.author.username|first|upper }}
+                {% if post.author.profile_picture %}
+                    <img src="{{ post.author.profile_picture.url }}" alt="{{ post.author.username }}">
+                {% else %}
+                    {{ post.author.username|first|upper }}
+                {% endif %}
             </span>
             <span>
-                <strong>@{{ post.author.username }}</strong><br>
+                <a href="{% url 'feed:view_profile' post.author.username %}" class="{% if 'view_profile' in request.path %}active{% endif %}">
+                    <strong>@{{ post.author.username }}</strong><br>
+                </a>
                 <span class="muted">Student post</span>
             </span>
         </div>
 
+        <h1>{{ post.title }}</h1>
+
         <div class="post-body">
             {{ post.body|linebreaks }}
         </div>
-        <br>
+
+        <!-- Image preview for photos -->
+        {% if post.file_attached and post.is_image %}
+            <div class="post-attachment">
+                <img src="{{ post.file_attached.url }}" alt="{{ post.title }}">
+            </div>
+        {% endif %}
+
+        <!-- File Attachment Display -->
+        {% if post.file_attached and not post.is_image%}
+            <div class="file-attachment">
+                <div class="file-attachment-card">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <div class="file-info">
+                        <a href="{{ post.file_attached.url }}" target="_blank" class="file-name">
+                            {{ post.file_attached.name|cut:"uploads/" }}
+                        </a>
+                        <span class="file-size muted">
+                            {{ post.file_attached.size|filesizeformat }}
+                        </span>
+                    </div>
+                    <a href="{{ post.file_attached.url }}" download class="download-button" title="Download file">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        {% endif %}
         <br>
 
         <form method="post" action="{% url 'feed:like_post' post.id %}">
             {% csrf_token %}
             <button class="button button-secondary" type="submit">
                 {% if user in post.likes.all %}
-                    🩶Unlike
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px; color: red;">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                    </svg>
+                    {{ post.like_count }}
                 {% else %}
-                    ❤️Like
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                    </svg>
+                    {{ post.like_count }}
                 {% endif %}
             </button>
-            <h3>{{ post.like_count }} likes</h3>
         </form>
-
-        
     </article>
-    <br>
+
     <section class="comments-card">
         <div class="section-heading">
             <div>
-                <p class="eyebrow">Discussion</p>
-                <h2>
+                <p class="eyebrow">Comments</p>
+                <p class="muted">
                     {{ post.comments.count }}
                     repl{{ post.comments.count|pluralize:"y,ies" }}
-                </h2>
+                </p>
             </div>
         </div>
 
@@ -65,7 +116,7 @@
                 method="post"
             >
                 {% csrf_token %}
-                {{ comments_form.as_p }}
+                {{ comments_form.body }}
                 <button class="button" type="submit">
                     Post reply
                 </button>
@@ -83,11 +134,15 @@
                     <div class="comment-head">
                         <span class="author-link">
                             <span class="avatar">
-                                {{ comment.author.username|first|upper }}
+                                {% if comment.author.profile_picture %}
+                                    <img src="{{ comment.author.profile_picture.url }}" alt="{{ comment.author.username }}">
+                                {% else %}
+                                    {{ comment.author.username|first|upper }}
+                                {% endif %}
                             </span>
-                            <strong>
-                                @{{ comment.author.username }}
-                            </strong>
+                            <a href="{% url 'feed:view_profile' comment.author.username %}" class="{% if 'view_profile' in request.path %}active{% endif %}">
+                                <strong>@{{ comment.author.username }}</strong><br>
+                            </a>
                         </span>
                         <span class="muted">
                             {{ comment.created_at|date:"M j · H:i" }}
@@ -102,8 +157,9 @@
             {% endfor %}
         </div>
     </section>
+</div>
 
-    <br>
+<div class="detail-actions">
     {% if request.user == post.author %}
         <form method="post" action="{% url 'feed:delete_post' post.id %}">
             {% csrf_token %}
@@ -112,9 +168,5 @@
             </button>
         </form>
     {% endif %}
-    
-    <a class="text-action" href="{% url 'feed:home' %}">
-        ← Back to feed
-    </a>
 </div>
 {% endblock %}

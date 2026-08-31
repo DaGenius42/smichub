@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Join · CampusConnect{% endblock %}
+{% block title %}Join · SMIC HUB{% endblock %}
 
 {% block content %}
 <section class="form-card auth-card">
@@ -10,8 +10,38 @@
 
     <form class="stacked-form" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button class="button" type="submit">Create account</button>
+        
+        <!-- Display non-field errors (e.g., password mismatch) -->
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Loop through form fields -->
+        {% for field in form %}
+            <div class="form-group {% if field.errors %}has-error{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="field-error">
+                        {% for error in field.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <br>
+        <div class="form-actions">
+            <button class="button button-full" type="submit">Create account</button>
+        </div>
     </form>
 
     <p class="form-footnote">

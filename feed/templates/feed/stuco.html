@@ -1,0 +1,182 @@
+{% extends "base-after-login.html" %}
+
+{% block title %}SMICHUB{% endblock %}
+
+{% block content %}
+<section class="content-grid">
+    <!-- Center column - only posts -->
+    <div class="feed-column">
+
+
+        <!-- News list -->
+        <div class="post-list">
+            {% for news_item in news %}
+                <a href="{% url 'feed:news_post' news_item.id %}">
+                    <article class="post-card">
+                        <div class="post-card-topline">
+                            <span class="category-pill category-{{ news_item.category }}">
+                                {{ news_item.get_category_display | upper }}
+                            </span>
+                            <span class="muted">{{ news_item.created_at|date:"M j, Y · H:i" }}</span>
+                        </div>
+
+                        <h2 class="post-title">
+                            {{ news_item.title }}
+                        </h2>
+
+                        <p class="post-excerpt">
+                            {{ news_item.body | truncatechars:600 }}
+                        </p>
+                        {% if news_item.file_attached and news_item.is_image %}
+                            <div class="post-attachment">
+                                <img src="{{ news_item.file_attached.url }}" alt="{{ news_item.title }}">
+                            </div>
+                        {% endif %}
+
+                        <div class="post-footer">
+                            <span class="author-link">
+                                <span class="avatar">S</span>
+                                @StuCo
+                            </span>
+                            <div class="post-stats">
+                                <span>{{ news_item.like_count }} likes</span>
+                            </div>
+                        </div>
+                    </article>
+                </a>
+            {% empty %}
+                <div class="empty-state">
+                    <h3>No news available.</h3>
+                    <p>Check back later for updates!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <aside class="right-sidebar">
+        <!-- StuCo Cabinet -->
+        <div class="sidebar-card team-card">
+            <p class="eyebrow">Our Team</p>
+            <h3>StuCo Cabinet</h3>
+            <ul class="team-list">
+                <li class="team-member">
+                    <span class="team-badge">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16.36 12.76C18.31 13.42 20 14.5 20 16v5H4v-5c0-1.5 1.69-2.58 3.65-3.24L8.27 14l.23.5c-1.5.46-2.6 1.12-2.6 1.5v3.1h4.22l.88-5.07l-.94-1.88c.62-.07 1.27-.12 1.94-.12s1.32.05 1.94.12L13 14.03l.88 5.07h4.22V16c0-.38-1.1-1.04-2.6-1.5l.23-.5zM12 5c-1.1 0-2 .9-2 2s.9 2 2 2s2-.9 2-2s-.9-2-2-2m0 6c-2.21 0-4-1.79-4-4s1.79-4 4-4s4 1.79 4 4s-1.79 4-4 4"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">President</span>
+                        <span class="team-name">Cellestine Zuo</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M21 21V5H3v8H1V5q0-.825.588-1.412T3 3h18q.825 0 1.413.588T23 5v14q0 .825-.587 1.413T21 21M6.175 12.825Q5 11.65 5 10t1.175-2.825T9 6t2.825 1.175T13 10t-1.175 2.825T9 14t-2.825-1.175m4.238-1.412Q11 10.825 11 10t-.587-1.412T9 8t-1.412.588T7 10t.588 1.413T9 12t1.413-.587M1 22v-2.8q0-.85.438-1.562T2.6 16.55q1.55-.775 3.15-1.162T9 15t3.25.388t3.15 1.162q.725.375 1.163 1.088T17 19.2V22zm2-2h12v-.8q0-.275-.137-.5t-.363-.35q-1.35-.675-2.725-1.012T9 17t-2.775.338T3.5 18.35q-.225.125-.363.35T3 19.2zm6 0"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Vice President</span>
+                        <span class="team-name">Jerry Li</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge">
+                        <svg viewBox="0 0 64 64" width="18" height="18" fill="currentColor"><path d="M53.1 10.3h-2.3V8c0-3.4-2.8-6.3-6.3-6.3H14.3C10.8 1.8 8 4.6 8 8v34.2c0 1.3.5 2.5 1.4 3.5l14.6 15c.9 1 2.2 1.5 3.6 1.5h18.3c2.7 0 5-2.2 5-5v-.9l4.8-9.7c.2-.3.2-.6.2-1l.1-32.4c0-1.5-1.3-2.8-2.9-2.9m-1.6 8.1h-5.6v-3.7h5.6zm-7.1-3.6q.15 0 0 0q.15 0 0 0M23.8 54l-8.2-8.4h8.2zm22.1 3.8H28.3V43.9c0-1.6-1.3-2.8-2.8-2.8h-13V8c0-1 .8-1.8 1.8-1.8h30.4c1 0 1.8.8 1.8 1.8v2.2h-2c-1.7 0-3 1.3-3 2.9l-.1 32.5c0 .4.1.7.2 1l4.9 9.7v.9c-.1.3-.3.6-.6.6m2.7-7l-2.8-5.7V22.9h5.6v22.2z"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Secretary</span>
+                        <span class="team-name">Lucas Lee</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 16c0-1.105-3.134-2-7-2s-7 .895-7 2s3.134 2 7 2s7-.895 7-2ZM2 16v4.937C2 22.077 5.134 23 9 23s7-.924 7-2.063V16M9 5c-4.418 0-8 .895-8 2s3.582 2 8 2M1 7v5c0 1.013 3.582 2 8 2M23 4c0-1.105-3.1-2-6.923-2s-6.923.895-6.923 2s3.1 2 6.923 2S23 5.105 23 4Zm-7 12c3.824 0 7-.987 7-2V4M9.154 4v10.166M9 9c0 1.013 3.253 2 7.077 2S23 10.013 23 9"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Treasurer</span>
+                        <span class="team-name">Amy Feng</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M2 5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2h-7v2h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2H4a2 2 0 0 1-2-2zm18 11V5H4v11z"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Chief Technology Officer</span>
+                        <span class="team-name">Mike Zhan</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h1a2 2 0 0 0 2-2a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2"></path><path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0-6 0"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Media Officer</span>
+                        <span class="team-name">Sophie Sun</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="m9.2 23.9l-1.75-1l3-5.2l-1.7-1l-1.5 2.6l-1.75-1l5.15-8.9q-.95-.975-1.425-2.225T8.75 4.6q0-.9.225-1.787T9.7 1.1l1.7 1q-.35.575-.5 1.188t-.15 1.262q0 1.325.65 2.488T13.25 8.9l2.25 1.3q1.55.9 2.275 2.588t.725 3.162q0 .95-.25 1.85t-.7 1.7l-1.75-1q.35-.6.5-1.225T16.45 16q0-.8-.225-1.55t-.725-1.4zM16 9q-.825 0-1.412-.587T14 7t.588-1.412T16 5t1.413.588T18 7t-.587 1.413T16 9m-2.5-5q-.65 0-1.075-.45T12 2.5q0-.65.45-1.075T13.5 1q.65 0 1.075.45T15 2.5q0 .65-.45 1.075T13.5 4"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Activity Officer</span>
+                        <span class="team-name">Lily Guofo</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12.75 3.94c1-.72 2.16-1.08 3.47-1.08c.72 0 1.51.19 2.37.59q1.29.585 2.04 1.38c1.03 1.28 1.46 2.77 1.31 4.47c-.16 1.7-.72 3.03-1.69 3.97l-7.59 7.59c-.19.19-.43.28-.71.28s-.51-.09-.7-.28a.94.94 0 0 1-.28-.7c0-.28.09-.52.28-.71l4.59-4.59c.25-.22.25-.45 0-.7s-.48-.25-.7 0l-4.59 4.59a.95.95 0 0 1-.71.28c-.28 0-.51-.09-.7-.28a.94.94 0 0 1-.28-.7c0-.28.09-.52.28-.71l4.59-4.59q.405-.375 0-.75c-.23-.25-.45-.25-.7 0l-4.59 4.64a.98.98 0 0 1-.71.28c-.28 0-.52-.09-.73-.28c-.2-.19-.3-.42-.3-.7q0-.42.33-.75l4.6-4.6c.25-.25.25-.48 0-.7s-.49-.22-.71 0L6.28 14.5c-.22.2-.45.31-.7.31c-.28 0-.52-.1-.7-.31c-.19-.2-.29-.44-.29-.72s.1-.51.29-.7C7.94 10 9.83 8.14 10.55 7.45l3.56 3.52c.39.37.84.56 1.39.56c.7 0 1.25-.28 1.66-.84c.28-.41.38-.86.3-1.36s-.29-.92-.63-1.27zm2.06 6.33L10.55 6l-7.08 7.08c-.84-.85-1.32-2.15-1.43-3.92c-.11-1.76.37-3.29 1.43-4.57c1.19-1.18 2.61-1.78 4.26-1.78c1.66 0 3.07.6 4.22 1.78l4.27 4.27c.19.19.28.42.28.7s-.09.52-.28.71c-.19.18-.42.28-.72.28c-.27 0-.5-.1-.69-.28"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Charity Officer</span>
+                        <span class="team-name">Connie Hou</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- House Leaders -->
+        <div class="sidebar-card team-card">
+            <p class="eyebrow">House Teams</p>
+            <h3>House Leaders</h3>
+            <ul class="team-list">
+                <li class="team-member">
+                    <span class="team-badge house-badge-red">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 9L12 1L2 9v2h2v10h5v-4a3 3 0 1 1 6 0v4h5V11h2z"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Red House</span>
+                        <span class="team-name">Cassie Wu</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge house-badge-yellow">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 9L12 1L2 9v2h2v10h5v-4a3 3 0 1 1 6 0v4h5V11h2z"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Yellow House</span>
+                        <span class="team-name">Camille Lv</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge house-badge-green">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 9L12 1L2 9v2h2v10h5v-4a3 3 0 1 1 6 0v4h5V11h2z"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Green House</span>
+                        <span class="team-name">Hyun Lee</span>
+                    </span>
+                </li>
+                <li class="team-member">
+                    <span class="team-badge house-badge-blue">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 9L12 1L2 9v2h2v10h5v-4a3 3 0 1 1 6 0v4h5V11h2z"></path></svg>
+                    </span>
+                    <span class="team-info">
+                        <span class="team-role">Blue House</span>
+                        <span class="team-name">Camille Kou</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </aside>
+        
+</section>
+{% endblock %}

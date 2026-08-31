@@ -1,0 +1,21 @@
+{% extends "base-after-login.html" %}
+
+{% block title %}House Standings · SMIC HUB{% endblock %}
+
+{% block content %}
+<div class="standings-container">
+    <div class="houses-grid">
+        {% for house in houses %}
+            <div class="house-card house-{{ house.name|lower }}">
+                <div class="house-image">
+                    <img src="/media/house/{{ house.name|lower }}.png" 
+                         alt="{{ house.name }} House"
+                         onerror="this.style.display='none'">
+                </div>
+                <h2 class="house-name">{{ house.name }} House</h2>
+                <div class="house-points">{{ house.points }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
