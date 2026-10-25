@@ -2,12 +2,25 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from .models import Post, News, House, Comments, CustomUser, Vote, Price
+from .models import Post, News, House, Comments, CustomUser, Vote, Price, Notification
 from .forms import PostForm, CommentsForm, ProfileForm, VoteForm
 from django.core.exceptions import PermissionDenied 
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 from .forms import CustomUserForm
+
+
+def create_notification(recipient, actor, notification_type, post=None, message=""):
+    """Create a notification unless the recipient is the actor themselves."""
+    if recipient is None or recipient == actor:
+        return
+    Notification.objects.create(
+        recipient=recipient,
+        actor=actor,
+        notification_type=notification_type,
+        post=post,
+        message=message,
+    )
 
 @login_required
 def home(request):
@@ -62,6 +75,18 @@ def create_post(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+            # Let everyone else know a new post was published.
+            others = CustomUser.objects.exclude(pk=request.user.pk)
+            Notification.objects.bulk_create([
+                Notification(
+                    recipient=user,
+                    actor=request.user,
+                    notification_type='new_post',
+                    post=post,
+                    message=f"{request.user.username} shared a new post: {post.title}",
+                )
+                for user in others
+            ])
             return redirect('feed:home')
     else:
         form = PostForm()
@@ -86,6 +111,13 @@ def create_comment(request, post_id):
         comment.post = post
         comment.author = request.user
         comment.save()
+        create_notification(
+            post.author,
+            request.user,
+            'comment',
+            post,
+            f"{request.user.username} commented on your post: {post.title}",
+        )
     return redirect('feed:user_post', post_id=post.id)
 
 @login_required
@@ -96,6 +128,13 @@ def like_post(request, post_id):
         post.likes.remove(request.user)
     else:
         post.likes.add(request.user)
+        create_notification(
+            post.author,
+            request.user,
+            'like',
+            post,
+            f"{request.user.username} liked your post: {post.title}",
+        )
     return redirect('feed:user_post', post_id=post.id)
 
 @login_required
@@ -168,7 +207,19 @@ def cc(request):
 
 @login_required
 def notifications(request):
-    return render(request, 'feed/notifications.html')
+    qs = Notification.objects.filter(
+        recipient=request.user
+    ).select_related('actor', 'post')
+    # Remember which ones were unread so the page can highlight them,
+    # then clear the red bubble by marking them as read.
+    unread_ids = list(qs.filter(is_read=False).values_list('id', flat=True))
+    if unread_ids:
+        Notification.objects.filter(id__in=unread_ids).update(is_read=True)
+    context = {
+        'notifications': qs,
+        'unread_ids': unread_ids,
+    }
+    return render(request, 'feed/notifications.html', context)
 
 @login_required
 def house_standings(request):

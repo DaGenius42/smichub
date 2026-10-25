@@ -1759,3 +1759,325 @@ select:focus {
     padding: 20px;
     text-align: center;
 }
+
+/* ==========================================================================
+   Notifications
+   ========================================================================== */
+
+/* ---- Red unread bubble (used in top nav + sidebar) ---- */
+@keyframes notifPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.14); }
+}
+
+.notif-badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 0 0 2px #ffffff, 0 2px 6px rgba(239, 68, 68, 0.45);
+    animation: notifPulse 2s ease-in-out infinite;
+}
+
+/* Bell button in the top navigation bar */
+.nav-bell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    color: #4a5568;
+    transition: color 0.2s, background 0.2s;
+}
+
+.nav-bell:hover,
+.nav-bell.active {
+    color: #4f46e5;
+    background: rgba(79, 70, 229, 0.08);
+}
+
+.nav-bell svg {
+    width: 21px;
+    height: 21px;
+}
+
+/* Badge sits inline at the end of the sidebar row */
+.notif-badge-sidebar {
+    position: static;
+    margin-left: auto;
+    animation: none;
+    box-shadow: 0 0 0 2px #ffffff;
+}
+
+/* ---- Notifications page ---- */
+.notif-page {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.notif-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.notif-header h1 {
+    margin: 2px 0 0;
+    font-size: 1.8rem;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+.notif-header .muted {
+    margin: 4px 0 0;
+    font-size: 0.92rem;
+}
+
+.notif-pill {
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 6px 13px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.notif-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.notif-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.notif-item:hover {
+    transform: translateY(-1px);
+    border-color: rgba(79, 70, 229, 0.35);
+    box-shadow: 0 12px 28px rgba(36, 45, 78, 0.09);
+}
+
+.notif-item.notif-unread {
+    background: linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%);
+    border-color: rgba(79, 70, 229, 0.28);
+}
+
+.notif-avatar {
+    position: relative;
+    flex: 0 0 auto;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.notif-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.notif-type {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+}
+
+.notif-type svg {
+    width: 12px;
+    height: 12px;
+}
+
+.notif-type-like { background: #ef4444; }
+.notif-type-comment { background: #3b82f6; }
+.notif-type-new_post { background: #10b981; }
+
+.notif-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-text {
+    margin: 0;
+    font-weight: 500;
+    color: var(--text);
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.notif-time {
+    display: inline-block;
+    margin-top: 3px;
+    font-size: 0.78rem;
+    color: var(--muted);
+}
+
+.notif-open {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.notif-open:hover {
+    background: var(--brand);
+    color: #ffffff;
+    transform: translateX(1px);
+}
+
+.notif-open svg {
+    width: 14px;
+    height: 14px;
+}
+
+.notif-dot {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+}
+
+/* ---- Empty state ---- */
+.notif-empty {
+    text-align: center;
+    padding: 56px 24px;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-large);
+}
+
+.notif-empty-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    background: var(--brand-soft);
+    color: var(--brand);
+    margin-bottom: 14px;
+}
+
+.notif-empty-icon svg {
+    width: 30px;
+    height: 30px;
+}
+
+.notif-empty h3 {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+}
+
+.notif-empty p {
+    margin: 0 auto 18px;
+    max-width: 340px;
+}
+
+/* ---- Phone layout ---- */
+@media (max-width: 640px) {
+    .notif-header h1 {
+        font-size: 1.45rem;
+    }
+
+    .notif-item {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .notif-avatar {
+        width: 42px;
+        height: 42px;
+    }
+
+    .notif-open {
+        padding: 9px;
+        border-radius: 50%;
+    }
+
+    .notif-open span {
+        display: none;
+    }
+
+    .notif-open svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .notif-dot {
+        top: 10px;
+        right: 10px;
+    }
+
+    .notif-empty {
+        padding: 40px 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-bell {
+        width: 34px;
+        height: 34px;
+    }
+
+    .nav-bell svg {
+        width: 19px;
+        height: 19px;
+    }
+
+    .notif-badge {
+        min-width: 17px;
+        height: 17px;
+        font-size: 0.62rem;
+    }
+}

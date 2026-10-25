@@ -173,6 +173,44 @@ class Price(models.Model):
     def thumbs_count(self):
         return self.thumbs.count()
 
+
+class Notification(models.Model):
+    """A single alert shown to a user on the notifications page."""
+
+    TYPE_CHOICES = [
+        ("new_post", "New post"),
+        ("like", "Like"),
+        ("comment", "Comment"),
+    ]
+
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="sent_notifications",
+    )
+    notification_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notifications",
+    )
+    message = models.CharField(max_length=255, blank=True, default="")
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.actor.username} -> {self.recipient.username} ({self.notification_type})"
+
 """
 ==============================
 Django Model Field Reference
