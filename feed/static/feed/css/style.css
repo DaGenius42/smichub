@@ -1808,7 +1808,12 @@ select:focus {
     background: rgba(79, 70, 229, 0.08);
 }
 
+/* Centred against the full 38px circle: the shared .main-nav a padding
+   shrinks the content box below the icon size, which pushes it off-centre. */
 .nav-bell svg {
+    position: absolute;
+    inset: 0;
+    margin: auto;
     width: 21px;
     height: 21px;
 }
