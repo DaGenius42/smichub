@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.conf import settings
 
+
 def validate(value):
     if not value:
         return
@@ -210,6 +211,21 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.actor.username} -> {self.recipient.username} ({self.notification_type})"
+
+class UserNotificationSetting(models.Model):
+    user = models.OneToOneField(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.CASCADE,
+            related_name="notify_setting"
+        )
+    notify_like = models.BooleanField(default=True)
+    notify_comment = models.BooleanField(default=True)
+    notify_new_post = models.BooleanField(default=True)
+    notify_stuco_news = models.BooleanField(default=True)
+    notify_house_point = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Notify setting for {self.user.username}"
 
 """
 ==============================

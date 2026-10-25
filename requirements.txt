@@ -4,3 +4,4 @@ gunicorn==26.0.0
 fastapi
 fastapi-mail
 uvicorn
+requests
