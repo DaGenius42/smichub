@@ -209,7 +209,7 @@ def cc(request):
 def notifications(request):
     qs = Notification.objects.filter(
         recipient=request.user
-    ).select_related('actor', 'post')
+    ).select_related('actor', 'post', 'news')
     # Remember which ones were unread so the page can highlight them,
     # then clear the red bubble by marking them as read.
     unread_ids = list(qs.filter(is_read=False).values_list('id', flat=True))

@@ -180,6 +180,7 @@ class Notification(models.Model):
 
     TYPE_CHOICES = [
         ("new_post", "New post"),
+        ("stuco_news", "StuCo news"),
         ("like", "Like"),
         ("comment", "Comment"),
     ]
@@ -193,10 +194,19 @@ class Notification(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="sent_notifications",
+        null=True,
+        blank=True,
     )
     notification_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     post = models.ForeignKey(
         Post,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notifications",
+    )
+    news = models.ForeignKey(
+        News,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -210,7 +220,8 @@ class Notification(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.actor.username} -> {self.recipient.username} ({self.notification_type})"
+        actor = self.actor.username if self.actor else "StuCo"
+        return f"{actor} -> {self.recipient.username} ({self.notification_type})"
 
 class UserNotificationSetting(models.Model):
     user = models.OneToOneField(

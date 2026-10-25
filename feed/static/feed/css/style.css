@@ -1937,6 +1937,7 @@ select:focus {
 .notif-type-like { background: #ef4444; }
 .notif-type-comment { background: #3b82f6; }
 .notif-type-new_post { background: #10b981; }
+.notif-type-stuco_news { background: #f59e0b; }
 
 .notif-body {
     flex: 1;
