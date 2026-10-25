@@ -712,9 +712,9 @@
                             id="nav-search-input"
                             autocomplete="off"
                         >
-                        <button type="submit" class="nav-search-btn" aria-label="Search">
+                        <!-- <button type="submit" class="nav-search-btn" aria-label="Search">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                        </button>
+                        </button> -->
                     </form>
                     <div class="nav-search-results" id="nav-search-results" hidden>
                         <ul class="nav-search-results-list" id="nav-search-results-list"></ul>
@@ -784,7 +784,7 @@
                 <li>
                     <a href="{% url 'feed:notifications' %}" class="{% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
                         <span class="icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" fill-rule="evenodd" d="M8 1a1 1 0 0 0-1 1v.1A5 5 0 0 0 3 7v4l-1.205 1.328c-.583.643-.127 1.672.74 1.672h3.733a2 2 0 0 0 3.464 0h3.733c.867 0 1.323-1.03.74-1.672L13 11V7a5 5 0 0 0-4-4.9V2a1 1 0 0 0-1-1M4.5 11.58l-.39.428l-.446.492h8.672l-.447-.492l-.389-.429V7a3.5 3.5 0 1 0-7 0z" clip-rule="evenodd"></path></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 16 16"><g stroke-width="0.01"><path fill="currentColor" fill-rule="evenodd" d="M8 1a1 1 0 0 0-1 1v.1A5 5 0 0 0 3 7v4l-1.205 1.328c-.583.643-.127 1.672.74 1.672h3.733a2 2 0 0 0 3.464 0h3.733c.867 0 1.323-1.03.74-1.672L13 11V7a5 5 0 0 0-4-4.9V2a1 1 0 0 0-1-1M4.5 11.58l-.39.428l-.446.492h8.672l-.447-.492l-.389-.429V7a3.5 3.5 0 1 0-7 0z" clip-rule="evenodd"></path></svg>
                         </span>
                         Notifications
                         {% if unread_notifications_count %}
@@ -929,9 +929,11 @@
         var results = document.getElementById('nav-search-results');
         var list = document.getElementById('nav-search-results-list');
         var empty = document.getElementById('nav-search-empty');
-        var wrap = document.getElementById('nav-search-wrapper');
+        var wrap = input.closest('.nav-search-dropdown');
 
         var debounceTimer = null;
+        var requestId = 0;
+        var active = false;
 
         function escapeHtml(s) {
             var d = document.createElement('div');
@@ -976,43 +978,72 @@
             });
         }
 
+        function closeResults(immediate) {
+            active = false;
+            requestId += 1;
+            clearTimeout(debounceTimer);
+            if (immediate) {
+                results.hidden = true;
+                return;
+            }
+            // Let a click on a result land before hiding the panel.
+            setTimeout(function () {
+                if (document.activeElement !== input) {
+                    results.hidden = true;
+                }
+            }, 120);
+        }
+
         function fetchUsers(q) {
+            var id = ++requestId;
             if (!q.trim()) {
                 renderUsers([]);
-                results.hidden = false;
+                if (active) {
+                    results.hidden = false;
+                }
                 return;
             }
             fetch('/users/search/?q=' + encodeURIComponent(q.trim()))
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
+                    if (!active || id !== requestId) { return; }
                     renderUsers(data.users || []);
                     results.hidden = false;
                 })
                 .catch(function () {
-                    results.hidden = true;
+                    if (id === requestId) {
+                        results.hidden = true;
+                    }
                 });
         }
 
         input.addEventListener('focus', function () {
+            active = true;
             fetchUsers(input.value);
         });
 
         input.addEventListener('input', function () {
+            if (!active) { return; }
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(function () {
                 fetchUsers(input.value);
             }, 150);
         });
 
+        input.addEventListener('blur', function () {
+            closeResults(false);
+        });
+
         document.addEventListener('click', function (e) {
             if (!wrap.contains(e.target)) {
-                results.hidden = true;
+                closeResults(true);
             }
         });
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
-                results.hidden = true;
+                closeResults(true);
+                input.blur();
             }
         });
     })();
